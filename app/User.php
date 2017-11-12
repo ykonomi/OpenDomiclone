@@ -46,7 +46,7 @@ class User extends Authenticatable
      */
     public function initDeck()
     {
-        $copper = 1;  $estate = 2;
+        $copper = 1;  $estate = 4;
         $cards = [$estate, $estate, $estate, $copper, $copper,
                   $copper, $copper, $copper, $copper, $copper];
         shuffle($cards);

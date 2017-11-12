@@ -9,12 +9,7 @@
         <div> 山札番号:{{ deck }}</div>
         <div> 捨て札番号:{{ discard }}</div>
         <div> プレイエリア:{{ play_area }}</div>
-        <h2> 公開版 - ver 0.80 - </h2>
-        <div class="container row col-xs-3 btn-group" data-toggle="buttons">
-                <ui-test2 v-for="content in contents"  :name="content.name" 
-                          :desc="content.desc" :type="content.type" :cost="content.cost" :key="1">
-                </ui-test2>
-        </div>
+        <h2> 開発版 - ver 0.80 - </h2>
     </div>
 </template>
 

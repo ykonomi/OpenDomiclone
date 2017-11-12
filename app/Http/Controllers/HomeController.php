@@ -26,10 +26,4 @@ class HomeController extends Controller
     {
         return view('home');
     }
-
-    public function chat()
-    {
-        $name = Auth::user()->name;
-        return view('chat', compact('name'));
-    }
 }

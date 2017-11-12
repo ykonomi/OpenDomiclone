@@ -13,7 +13,7 @@
  カードを購入致しました。<br />
 </b>
 </transition>
-<button text="a" @click="a"></button>
+<button text="a" @click="a"> ボタンを押してね</button>
 </p>
 </template>
 

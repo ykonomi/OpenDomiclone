@@ -1,31 +1,22 @@
 <template>
-<h1>
-    <span class="typewrite" :period="500"></span>
-    <span class="wrap">
-        {{content}}
-    </span>
-</h1>
-<!--        <p>
-        <div id="talkField" class="container">
-            <div id="result"></div>
-            <br class="clear_balloon"/>
-            <div id="end"></div>
+    <div class="panel panel-warning" >
+        <div class="panel-heading">システムさま：</div>
+        <div class="panel-body">
+            <span class="typewrite" :period="500"></span>
+            <span class="wrap">
+                {{content}}
+            </span>
         </div>
-        <div> {{who_turn}}のターンです </div>
-        <div class='user'>{{log.user}}</div>
-        <div class='left_balloon'>{{log.message}}</div>
-        </p>
     </div>
--->
 </template>
 
 <script>
 export default {
     props: ['log'],
     created: function () {
+        this.$store.dispatch('update', 'hoge');
 
         this.tick();
-        //setTimeout(function () { this.tick() }.bind(this), 1000);
     },
     data: function () {
         return {
@@ -38,7 +29,7 @@ export default {
     },
     methods: {
         tick : function () {
-            var fullTxt = this.log;
+            var fullTxt = this.$store.getters.log;
 
             if (this.isDeleting) {
                 this.txt = fullTxt.substring(0, this.txt.length - 1);

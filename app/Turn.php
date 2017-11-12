@@ -13,7 +13,7 @@ class Turn extends Model
     /**
      *   参加者全てのidを取得する
      */
-    public function get_entries()
+    public function getEntries()
     {
         $ids = [];
         $members = $this->all();
@@ -26,31 +26,12 @@ class Turn extends Model
     }
 
     /**
-     * 　参加IDをターンテーブルに追加する
-     *   重複している場合は追加しない
-     *
-     *   * 重複チェックをDBに任せるとおそらく面倒
+     *   IDをシャッフルし、登録する
      */
-    public function add($id)
+    public function register($ids)
     {
-        $members = $this->get_entries();
-
-        if (!in_array($id, $members)){
-            $this->user_id = $id;
-            $this->save();
-        }
-    }
-
-    /**
-     *   参加者テーブルをシャッフルで並べなおす。     
-     */
-    public function relocate()
-    {
-        $ids = $this->get_entries();
-
-        shuffle($ids);
-
         $this->truncate();
+        shuffle($ids);
 
         foreach ($ids as $id) {
             $turn = new Turn(); //foreachのたびにnewしないとsaveされないみたい
@@ -66,7 +47,7 @@ class Turn extends Model
     public function next($id)
     {
         
-        $entryIds = $this->get_entries();
+        $entryIds = $this->getEntries();
 
         $memberN = count($entryIds);
         $next = 0;

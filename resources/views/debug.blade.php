@@ -1,4 +1,4 @@
 @extends('layouts.app')
 @section('content')
-<start mode="production" id="{{Auth::id()}}"></start>
+<start mode="debug"></start>
 @endsection

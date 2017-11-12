@@ -10,6 +10,7 @@ use App\User;
 use App\Supply;
 use App\Card;
 use App\Turn;
+use App\DummyTurn;
 
 class DominionAPIController extends Controller
 {
@@ -22,12 +23,20 @@ class DominionAPIController extends Controller
     public function entry(Request $request)
     {
         $id = (int) $request->get('id');
-        $turnTable = new Turn();
+        $turnTable = new DummyTurn();
 
         $turnTable->add($id);
 
         //既に登録されているか関係なく参加idを通知する
-        broadcast(new \App\Events\OtherEntry($turnTable->get_entries()));
+        broadcast(new \App\Events\OtherEntry($turnTable->getEntries()));
+    }
+
+    public function entryOffline(Request $request)
+    {
+        $id = (int) $request->get('id');
+        $turnTable = new DummyTurn();
+
+        $turnTable->add($id);
     }
 
 
@@ -48,10 +57,9 @@ class DominionAPIController extends Controller
     public function getName(Request $request)
     {
         $user = new User();
-        $id = $request->get('id');
+        $id = (int) $request->get('id');
 
         return $user->getName($id);
-
     }
 
 
@@ -65,8 +73,13 @@ class DominionAPIController extends Controller
         $supply = new Supply();
         $supply->init();
 
+        $dummyTurnTable = new DummyTurn();
+        $ids = $dummyTurnTable->getEntries();
+
         $turnTable = new Turn();
-        $turnTable->relocate();
+        $turnTable->register($ids);
+
+        $dummyTurnTable->truncate();
     }
 
     //プレイヤーの山札、手札、捨て札、プレイエリアを初期化

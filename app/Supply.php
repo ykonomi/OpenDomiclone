@@ -23,7 +23,7 @@ class Supply extends Model
 
         //サプライの初期化(TODO ランダム化)
         //31 29 25 19 17 15 1 2 3 4 5
-        $supply = [1,2,3,4,5,6];
+        $supply = [1,2,3,4,5,6,31,29,25,19,17,15];
         foreach ($supply as $id) {
             $card = $card_list->find($id);
             $this->create($card->toArray());

@@ -15,31 +15,26 @@
 Auth::routes();
 //Broadcast::routes();
 
-Route::get('/pusher', function () {
-    return view('pusher');
-});
-Route::get('/ui_test', function (){
-   return view('ui_test'); 
-});
-
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/chat', 'HomeController@chat');
-Route::get('/voice', function () {
-    return view('voice');
-});
 Route::get('/logout', 'Auth\LoginController@logout');
 
+Route::get('/main',  function (){
+    return view('main');
+});
+Route::get('/offline' , function (){
+    return view('debug');
+});
+Route::get('/test' , function (){
+    return view('test');
+});
 
 Route::get('/entry', 'DominionAPIController@entry');
 
 Route::get('/init_parent', 'DominionAPIController@initParent');
 Route::get('/init_child', 'DominionAPIController@initChild');
-Route::get('/start'      , 'DominionAPIController@start');
 
-Route::get('/main',  function (){
-    return view('main');
-});
+Route::get('/start'      , 'DominionAPIController@start');
 
 Route::get('/get_name' ,  'DominionAPIController@getName');
 
@@ -61,6 +56,7 @@ Route::get('/turn_end', 'DominionAPIController@exitTurn');
 //for debug
 Route::get('/init_playdata', 'DebugController@init');
 
+Route::get('/debug/entry', 'DominionAPIController@entryOffline');
 Route::get('/debug/id' ,     'DebugController@get_id');
 Route::get('/debug/hand' ,   'DebugController@get_hand');
 Route::get('/debug/deck',    'DebugController@get_deck');
@@ -72,9 +68,6 @@ Route::get('/debug/update_session2' ,  'DebugController@update_session2');
 Route::get('/debug/update_session3' ,  'DebugController@update_session3');
 
 //Route::get('/get_card' ,  'DebugController@get_card');
-Route::get('/dev_action' , function (){
-    return view('dev_action');
-});
 //Route::get('/get_list' ,  'DebugController@get_list');
 
 

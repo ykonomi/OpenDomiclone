@@ -1,14 +1,14 @@
 <template>
-    <label class="btn btn-defalut btn-extend" @click="trigger">
-        <input type="checkbox" autocomplete="off"> 
+    <label class="btn btn-defalut btn-extend" 
+           @mouseenter="enter"
+           @mouseleave="leave"
+           @click="trigger">
+        <input type="checkbox" autocomplete="off" > 
         <div class="offer offer-radius" :class="type">
             <div class="offer-content">
                 <h3 class="lead">
                     {{this.name}}
                 </h3>
-                <p class="wrap">
-                {{this.desc}}
-                </p>
             </div>
             <div class="shape">
                 <div class="shape-text">
@@ -16,17 +16,36 @@
                 </div>
             </div>
         </div>
+        <div v-show="show">
+            <balloon :desc="desc"> </balloon>
+        </div>
     </label>
 </template>
 <script>
 export default {
     props: ["name","desc","type","cost","value"],
+    data: function () {
+        return {
+            show : false, 
+        }
+    },
     methods:{
         trigger : function (event) {
-            this.$emit('action', this.value);
-            this.$emit('buy1',    this.value);
-            this.$emit('buy2',    this.value);
-        }
+            //this.$store.dispatch('update', "aaaaaa");
+
+            this.$emit('aaa' , this.value);
+            this.$emit('buy1', this.value);
+            this.$emit('buy2', this.value);
+        },
+        enter : function() {
+            //説明がないものは表示しない
+            if (this.desc != ''){
+                this.show = true;
+            }
+        },
+        leave : function() {
+            this.show = false; 
+        },
     }
 
 }
@@ -41,8 +60,26 @@ export default {
 	-webkit-transform:rotate(360deg); /* Safari and Chrome */
 	transform:rotate(0deg);
 }
+
+.btn-extend {
+    display: block; 
+    padding: 0px;
+    margin: 10px;
+    position: relative;
+    outline:none;
+}
+
+.btn-extend.active {
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+}
+
+
 .offer{
-	background:#fff; border:1px solid #ddd; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); margin: 15px 0; overflow:hidden;
+	background:#fff;
+    border:1px solid #ddd;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); 
+    overflow:hidden;
 }
 .offer-radius{
 	border-radius:7px;
@@ -90,12 +127,6 @@ export default {
 }	
 .offer-content {
 	padding:0 20px 10px;
-}
-
-.btn-extend {
-white-space: normal;
-word-wrap: break-word;
-
 }
 
 </style>
