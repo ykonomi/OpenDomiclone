@@ -38,12 +38,16 @@ Route::get('/start'      , 'DominionAPIController@start');
 
 Route::get('/get_name' ,  'DominionAPIController@getName');
 
+
+Route::get('/hands',     'DominionAPIController@showHands');
+Route::get('/supplies' , 'DominionAPIController@showSupplies');
+Route::get('/playarea' , 'DominionAPIController@showPlayArea');
+
+
 Route::get('/action_phase/exist', 'DominionAPIController@containActionCards');
-Route::get('/action_phase/hands', 'DominionAPIController@showHands');
 Route::get('/action_phase/is_action', 'DominionAPIController@isActionCards');
 Route::get('/action_phase/action', 'DominionAPIController@action');
 
-Route::get('/buy_phase/supplies' ,  'DominionAPIController@showSupplies');
 Route::get('/buy_phase/estimate' ,  'DominionAPIController@estimate');
 Route::get('/buy_phase/hands' ,  'DominionAPIController@showHands');
 Route::get('/buy_phase/check' ,  'DominionAPIController@checkSelectedCards');
@@ -62,13 +66,10 @@ Route::get('/debug/hand' ,   'DebugController@get_hand');
 Route::get('/debug/deck',    'DebugController@get_deck');
 Route::get('/debug/discard', 'DebugController@get_discard');
 Route::get('/debug/playarea','DebugController@get_playarea');
+Route::get('/debug/coin','DebugController@get_coin');
+Route::get('/debug/action_counts','DebugController@get_action_counts');
+Route::get('/debug/buy_counts'   ,'DebugController@get_buy_counts');
 
-Route::get('/debug/update_session1' ,  'DebugController@update_session1');
-Route::get('/debug/update_session2' ,  'DebugController@update_session2');
-Route::get('/debug/update_session3' ,  'DebugController@update_session3');
-
-//Route::get('/get_card' ,  'DebugController@get_card');
-//Route::get('/get_list' ,  'DebugController@get_list');
 
 
 //+--------+----------+------------------------+------------------+------------------------------------------------------------------------+--------------+

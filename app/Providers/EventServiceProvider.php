@@ -19,6 +19,15 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\TurnChange' => [
             'App\Listeners\TurnChangeListener',
         ],
+        'App\Events\GameOver' => [
+            'App\Listeners\GameOverListener',
+        ],
+        'App\Events\CountedVictory' => [
+            'App\Listeners\CountedVictoryListener',
+        ],
+        'App\Events\Result' => [
+            'App\Listeners\Result',
+        ],
     ];
 
     /**

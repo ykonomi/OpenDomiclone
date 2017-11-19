@@ -46,6 +46,7 @@ if (token) {
 
  window.Pusher = require('pusher-js');
 
+
  window.Echo = new Echo({
      broadcaster: 'pusher',
      key: '92e7359b17db57a56e4b',

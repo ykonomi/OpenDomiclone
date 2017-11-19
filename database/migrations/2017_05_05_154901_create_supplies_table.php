@@ -16,12 +16,10 @@ class CreateSuppliesTable extends Migration
         Schema::create('supplies', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name_jp', 100);
-            $table->string('name_en', 100);
             $table->integer('coin_cost');
             $table->string('card_type', 100);
-            $table->integer('coin');
-            $table->integer('point');
             $table->string('description', 200);
+            $table->integer('rest');
         });
     }
 

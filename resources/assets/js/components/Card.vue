@@ -1,5 +1,6 @@
 <template>
     <label class="btn btn-defalut btn-extend" 
+           :class="{'card-active' : this.$store.getters.isActive}"
            @mouseenter="enter"
            @mouseleave="leave"
            @click="trigger">
@@ -31,11 +32,7 @@ export default {
     },
     methods:{
         trigger : function (event) {
-            //this.$store.dispatch('update', "aaaaaa");
-
-            this.$emit('aaa' , this.value);
-            this.$emit('buy1', this.value);
-            this.$emit('buy2', this.value);
+            this.$emit('trigger' , this.value);
         },
         enter : function() {
             //説明がないものは表示しない
@@ -69,6 +66,10 @@ export default {
     outline:none;
 }
 
+.card-active {
+    outline:none;
+}
+
 .btn-extend.active {
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px;
@@ -85,8 +86,8 @@ export default {
 	border-radius:7px;
 }
 
-.coin {	border-color: #FFD700; }
-.coin .shape{
+.treasure {	border-color: #FFD700; }
+.treasure .shape{
 	border-color: transparent transparent transparent #FFD700;
 	border-color: rgba(255,255,255,0)  rgba(255,255,255,0) rgba(255,255,255,0) #FFD700;
 }
@@ -112,8 +113,8 @@ export default {
 	border-color: transparent transparent transparent #DA70D6;
 	border-color: rgba(255,255,255,0)  rgba(255,255,255,0) rgba(255,255,255,0) #DA70D6;
 }
-.vp { border-color: #00EE00; }
-.vp .shape{
+.victory { border-color: #00EE00; }
+.victory .shape{
 	border-color: transparent transparent transparent #00EE00;
 	border-color: rgba(255,255,255,0)  rgba(255,255,255,0) rgba(255,255,255,0) #00EE00;
 }

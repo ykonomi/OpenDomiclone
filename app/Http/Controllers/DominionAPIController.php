@@ -27,7 +27,7 @@ class DominionAPIController extends Controller
 
         $turnTable->add($id);
 
-        //既に登録されているか関係なく参加idを通知する
+        //現在の参加メンバ(id)をブロードキャストする
         broadcast(new \App\Events\OtherEntry($turnTable->getEntries()));
     }
 
@@ -88,10 +88,10 @@ class DominionAPIController extends Controller
         $user = new User();
 
         session(['player_id' => $id]);
-        session(['play_area' => [1,2,3]]);
+        session(['play_area' => []]);
         session(['coin' => 0]);
-        session(['action' => 1]);
-        session(['buy'    => 1]);
+        session(['action_count' => 1]);
+        session(['buy_count'    => 1]);
 
 
         //山札を初期化して、上から５枚取り出す。
@@ -106,25 +106,46 @@ class DominionAPIController extends Controller
 
     public function exitTurn(Request $request)
     {
+        session(['coin' => 0]);
+        session(['action_count' => 1]);
+        session(['buy_count'    => 1]);
+
         $id = $request->input('id');
         $turnTable = new Turn();
-
-        $next_id = $turnTable->next($id);
-
-        session(['coin' => 0]);
-        session(['action' => 1]);
-        session(['buy'    => 1]);
-        session(['end'    => 0]);
-
-        broadcast(new \App\Events\TurnChange($next_id));
+        //$next_id = $turnTable->next($id);
+        //broadcast(new \App\Events\TurnChange($next_id));
     }
 
-    public function start(Request $request)
+    public function showHands()
     {
-        $start_id = $request->get('start_id');
-
-        return view("main", compact("start_id")); 
+        $user = new User();
+        $hands = session('hand');
         
+        return json_encode(['ui' => $user->show($hands)]);
+    }
+
+    public function showSupplies(Request $request)
+    {
+        $supply = new Supply();
+        return json_encode(['ui' => $supply->show()]);
+    }
+
+    public function showPlayArea()
+    {
+        $user = new User();
+        $playArea = session('play_area');
+        
+        return json_encode(['ui' => $user->show($playArea)]);
+    }
+
+    public function play($cardIndices)
+    {
+        $user = new User();
+        $hand = session('hand');
+        $playarea = session('play_area');
+        list($newHand, $newPlayArea) = $user->play($cardIndices, $hand);
+        session(['hand' => $newHand]);
+        session(['play_area' => array_merge($newPlayArea, $playarea)]);
     }
 
     public function containActionCards()
@@ -135,22 +156,6 @@ class DominionAPIController extends Controller
         return json_encode(['result' => $user->hasActionCardIn($hands)]);
     }
 
-    public function showHands()
-    {
-        $user = new User();
-        $hands = session('hand');
-        
-
-        return json_encode(['ui'       => $user->show($hands),
-                            'action_n' => $user->getActionCounts()]);
-    }
-
-    public function showSupplies(Request $request)
-    {
-        $supply = new Supply();
-        return json_encode(['ui' => $supply->show()]);
-    }
-
 
     /**
      *  選択した手札がアクションカードかを判断するメソッド
@@ -158,19 +163,20 @@ class DominionAPIController extends Controller
     public function isActionCards(Request $request)
     {
         $index = $request->input('idx');
-        $card_id = getCardInHand($index);
+        $card_id = $this->getCardInHand($index);
 
         $cardList = new Card();
-        return json_encode(['result' => $cardList->isAction($card_id)]);
+        $card_type = $cardList->find($card_id)->card_type;
+        return json_encode(['result' => $cardList->isAction($card_type)]);
     }
 
     /**
-     * n 番目の手札をとるメソッド
+     * n 番目の手札のカードIDを取得するメソッド
      */
     private function getCardInHand($n)
     {
         $hands = session('hand');
-        return $hand[$n];
+        return $hands[$n];
     }
     /**
      * n 番目の手札を取り除くメソッド
@@ -199,16 +205,64 @@ class DominionAPIController extends Controller
     {
         $user = new User();
         $index = $request->input('idx');
+
         $card_id = $this->getCardInHand($index);
+        //アクションカードを場に置く
+        $this->play([$index]);
 
-        //アクションカードをプレイする。
-        $this->removeCardInHand($index);
-        $this->setPlayArea($index);
+        //実際のアクション TODOリファクタリング
+        list($pcard, $paction, $pbuy, $pcoin) = $user->action($card_id);
 
-        return json_encode(['event' => $user->action($card_id)]);
+        $this->addActionCounts($paction);
+        $this->addBuyCounts($pbuy);
+        $this->addUserCoins($pcoin);
+
+        $hand_ = session('hand');
+        $deck = session('deck');
+        $discard = session('discard');
+
+        list ($hand, $deck, $discard) = $user->draw($pcard, $deck, $discard);
+        $hand = array_merge($hand_, $hand);
+        session(['deck' => $deck]);
+        session(['hand' => $hand]);
+        session(['discard' => $discard]); 
+
+
+        $action_count =  session('action_count') - 1;
+        session(['action_count' => $action_count]);
+
+
+        return json_encode(['action_count' => $action_count]);
     }
 
 
+    private function addActionCounts($n)
+    {
+        $actionN = session('action_count');
+        session(['action_count' => $actionN + (int) $n]);
+    }
+
+    private function getActionCounts()
+    {
+        return session('action_count');
+    }
+
+    private function addBuyCounts($n)
+    {
+        $buy = session('buy_count');
+        session(['buy_count' => $buy + $n]);
+    }
+
+    private function getBuyCounts()
+    {
+        return session('buy_count');
+    }
+
+    private function addUserCoins($n){
+        $coin = session('coin');
+        session(['coin' => $coin + $n]);
+    }
+    
     private function getUserCoins()
     {
         return session('coin');
@@ -234,16 +288,18 @@ class DominionAPIController extends Controller
     {
 
         $checks = $request->input('checks');
-        $card_id = (int) $request->input('id');
+        //空の時は終了
+        if(empty($checks)) return;
 
+        $card_id = (int) $request->input('id');
 
         $card = new Card();
         $hands = session('hand');
-
         $coin = 0;
         foreach ($checks as $idx) {
             $coin += $card->find($hands[(int) $idx])->coin;
         }
+        $coin += $this->getUserCoins();
 
         $end = $card->find($card_id)->coin_cost;
         
@@ -255,15 +311,34 @@ class DominionAPIController extends Controller
     {
         $user = new User();
 
-        //手札から購入に使うカードを取り除き、プレイエリアにだす
         $checks = $request->input('checks');
-        $user->play($checks);
+        //空の時は終了
+        if(empty($checks)) return;
+
+        //手札から購入に使うカードを取り除き、プレイエリアにだす
+        $this->play($checks);
 
         //購入したカードを捨て札に置く
         $cardId = (int) $request->input('id');
         $discard = session('discard');
         session(['discard' => $user->discard($cardId, $discard)]);
 
+        //サプライの数から一枚減らす
+        $supply = new Supply();
+        $isOver = $supply->draw($cardId);
+
+        //ゲーム終了判定
+        if($isOver){
+            //終了をブロードキャストする
+            broadcast(new \App\Events\GameOver());
+            $this->count();
+        }
+        
+        //購入可能回数を1減らす
+        $buy_count =  session('buy_count') - 1;
+        session(['buy_count' => $buy_count]);
+
+        return json_encode(['buy_count' => $buy_count]);
     }
 
 
@@ -277,7 +352,7 @@ class DominionAPIController extends Controller
                  'play_area' => []]);
 
         // 自分の手札を捨てる
-        $hands = session('hand');
+        $hand = session('hand');
         $discard = session('discard');
         session(['discard' => $user->discardArray($hand, $discard), 
                  'hand'    => []]);
@@ -285,8 +360,21 @@ class DominionAPIController extends Controller
         // 山札から５枚手札に補充する   
         $deck = session('deck');
         $discard = session('discard');
-        list ($deck, $hand, $discard) = $user->draw(5, $deck, $discard);
+        list ($hand, $deck, $discard) = $user->draw(5, $deck, $discard);
         session(['deck' => $deck, 'hand' => $hand, 'discard' => $discard]);
+    }
+
+    public function total()
+    {
+        //手札の勝利点を集計する
+        //山札の勝利点を集計する
+        //脇に寄せた分の勝利点を集計する
+        
+    }
+
+    public function exitGame()
+    {
+
     }
 
 

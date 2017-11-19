@@ -5,8 +5,8 @@
             <front :my_id="id" :start_id="start_id"></front>
         </div>
         <div v-if="debug">
-            <debug></debug>
             <front :my_id="1" :start_id="1"></front>
+            <debug></debug>
         </div>
     </div>
 </template>
@@ -66,9 +66,10 @@ export default {
             ]).then(axios.spread((res1, res2) => {
                 axios.all([
                     axios.get('/init_parent'),
-                ]).then(axios.spread((res) => {}));
+                ]).then(axios.spread((res) => {
+                    this.debug = true;
+                }));
             }));
-            this.debug = true;
         }
     },
     methods: {

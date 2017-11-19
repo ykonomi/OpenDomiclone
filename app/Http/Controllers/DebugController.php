@@ -48,6 +48,18 @@ class DebugController extends Controller
     {
         return session('play_area');
     }
+    public function get_coin()
+    {
+        return session('coin');
+    }
+    public function get_action_counts()
+    {
+        return session('action_count');
+    }
+    public function get_buy_counts()
+    {
+        return session('buy_count');
+    }
 
     public function getPlayAreaInfo(){
         $cardList = new Card();
@@ -65,51 +77,4 @@ class DebugController extends Controller
         return json_encode(['ui' => $result]);
     }
 
-    public function get_card(Request $request)
-    {
-        $id = $request->input('id');
-        $card = new Card();
-        $card = $card->find($id);
-        $result = ['name' => $card->name_jp, 'desc' => $card->description, 'cost' => $card->coin_cost, 'type' => $card->card_type];
-
-        return json_encode($result);
-    }
-
-    public function get_list(Request $request)
-    {
-        $result = [];
-        $card = new Card();
-        $cards = $card->all();
-
-        foreach ($cards as $card) {
-            array_push($result, $card->name_en);
-        }
-
-        return $result;
-        
-    }
-
-    public function update_session1()
-    {
-        $card = new Card;
-        session(['debug' => $card->find(2)->coin]);
-        
-        return json_encode(['updated' => session('debug')]);
-    }
-
-    public function update_session2()
-    {
-        $card = new Card;
-        //session(['debug' => $card->find(3)->coin]);
-        
-        return json_encode(['updated' => session('debug')]);
-    }
-
-    public function update_session3()
-    {
-        $card = new Card;
-        session(['debug' => $card->find(3)->coin]);
-        
-        return json_encode(['updated' => session('debug')]);
-    }
 }

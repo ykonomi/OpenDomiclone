@@ -1,12 +1,12 @@
 <template>
-<div class="popover right show balloon-extend">
-    <div class="arrow"></div>
-    <div class="popover-content">
-       <p>
-       {{desc}}
-        </p>
+    <div class="popover right show balloon-extend">
+        <div class="arrow"></div>
+        <div class="popover-content">
+            <p>
+            {{desc}}
+            </p>
+        </div>
     </div>
-</div>
 </template>
 
 <script>

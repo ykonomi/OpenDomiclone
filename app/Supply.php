@@ -9,10 +9,7 @@ use App\Card;
 class Supply extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['id', 'name_jp', 'name_en', 'card_set',
-        'coin_cost', 'coin_potion', 'coin_debt',
-        'class','card_type','coin','point',
-        'plus_card', 'plus_action','plus_buy','plus_coin','plus_point', 'description'];
+    protected $fillable = ['id', 'name_jp', 'coin_cost', 'card_type', 'description', 'rest'];
 
     public function init()
     {
@@ -21,12 +18,35 @@ class Supply extends Model
         //サプライのテーブルを削除
         $this->truncate();
 
+        //基本セットの追加
+        $basedSupplies = [1,2,3,4,5,6];
+        $baseRest      = [60,40,30,12,12,12];
+
+        foreach ($basedSupplies as $id) {
+            $card = $card_list->find($id);
+            $this->create(['id' => $id, 
+                'name_jp' => $card->name_jp,
+                'coin_cost' => $card->coin_cost,
+                'card_type' => $card->card_type,
+                'description' => $card->description,
+                'rest' => $baseRest[$id - 1]
+            ]);
+        }
+
+
         //サプライの初期化(TODO ランダム化)
         //31 29 25 19 17 15 1 2 3 4 5
-        $supply = [1,2,3,4,5,6,31,29,25,19,17,15];
-        foreach ($supply as $id) {
+        $supplies = [31,29,25,19,17,15];
+
+        foreach ($supplies as $id) {
             $card = $card_list->find($id);
-            $this->create($card->toArray());
+            $this->create(['id' => $id, 
+                'name_jp' => $card->name_jp,
+                'coin_cost' => $card->coin_cost,
+                'card_type' => $card->card_type,
+                'description' => $card->description,
+                'rest' => 10
+            ]);
         }
     }
 
@@ -37,7 +57,8 @@ class Supply extends Model
         $result = [];
 
         foreach ($supplies as $card) {
-            $result += [$index => 
+            if ($card->rest == 0) continue;
+             $result += [$index => 
                ['id'   => $card->id, 
                 'name' => $card->name_jp, 
                 'desc' => $card->description, 
@@ -47,6 +68,37 @@ class Supply extends Model
         }
 
         return $result;
+    }
+
+    public function draw($cardId)
+    {
+        $card = $this->find($cardId);
+        $rest = $card->rest - 1;
+        if ($rest == 0){
+            //ゲーム終了
+            if ($cardId == 6 || $this->isEmptyThreeTimes){
+                return true;
+            }
+        }
+
+        $card->rest = $rest;
+        $card->save();
+        
+        return false;
+    }
+
+    public function isEmptyThreeTimes()
+    {
+        $supplies = $this->all();
+
+        $count = 0;
+        foreach ($supplies as $card) {
+            if ($card->rest == 0){
+                $count++;
+            }
+        }
+        
+        return $count >= 3;
     }
 
 }

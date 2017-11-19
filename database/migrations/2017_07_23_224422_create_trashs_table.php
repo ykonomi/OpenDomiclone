@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDisposalsTable extends Migration
+class CreateTrashsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateDisposalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('disposals', function (Blueprint $table) {
+        Schema::create('trashs', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('card_id');
             $table->timestamps();
@@ -27,6 +27,6 @@ class CreateDisposalsTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('trashs');
     }
 }

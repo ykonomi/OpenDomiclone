@@ -2,14 +2,15 @@
     <div>
         <input type="button" value="init playdata" @click="init"></input>
         <input type="button" value="load session" @click="load_session"></input>
-        <input type="button" value="update session1" @click="update_session1"></input>
-        <input type="button" value="update session2" @click="update_session2"></input>
         <div> プレイヤID:{{ id }} </div>
-        <div> 手札番号:{{ hand }}</div>
-        <div> 山札番号:{{ deck }}</div>
-        <div> 捨て札番号:{{ discard }}</div>
-        <div> プレイエリア:{{ play_area }}</div>
-        <h2> 開発版 - ver 0.80 - </h2>
+        <div> hands : {{ hand }}</div>
+        <div> deck  : {{ deck }}</div>
+        <div> discard : {{ discard }}</div>
+        <div> play area : {{ play_area }}</div>
+        <div> +coin : {{ coin }}</div>
+        <div> +action : {{ action_count }}</div>
+        <div> +buy : {{ buy_count }}</div>
+        <h2> 開発版 - ver 0.85 - </h2>
     </div>
 </template>
 
@@ -24,7 +25,9 @@ export default {
             deck: [],
             discard: [],
             play_area: [],
-            contents : [],
+            coin: 0,
+            action_count: 0,
+            buy_count: 0,
         }
     },
     methods: {
@@ -41,31 +44,21 @@ export default {
                 axios.get('/debug/deck'),
                 axios.get('/debug/discard'),
                 axios.get('/debug/playarea'),
+                axios.get('/debug/coin'),
+                axios.get('/debug/action_counts'),
+                axios.get('/debug/buy_counts'),
             ])
-            .then(axios.spread((idres, handres, deckres, disres, playres) => {
+            .then(axios.spread((idres, handres, deckres, disres,
+                playres, coinres, actionres, buyres) => {
                 this.id = idres.data;
                 this.hand = handres.data;
                 this.deck = deckres.data;
                 this.discard = disres.data;
                 this.play_area = playres.data;
+                this.coin = coinres.data;
+                this.action_count = actionres.data;
+                this.buy_count = buyres.data;
             }));
-        },
-        update_session1 : function () {
-            axios.get('/debug/update_session1')
-                .then(res => {
-                    console.log(res.data.updated);
-                    axios.get('/debug/update_session2')
-                        .then(res => {
-                            console.log(res.data.updated);
-                        });
-
-                });
-        },
-        update_session2 : function () {
-            axios.get('/debug/update_session3')
-                .then(res => {
-                    console.log(res.data.updated);
-                });
         },
     }
 

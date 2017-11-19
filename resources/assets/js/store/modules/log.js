@@ -15,7 +15,7 @@ const actions = {
 // mutations
 const mutations = {
     update (state, log) {
-        state.log = log;
+        state.log = log + '\n' + state.log;
     }
 }
 

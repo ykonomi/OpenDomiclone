@@ -11,22 +11,19 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-
-class TurnChange implements ShouldBroadcastNow
+class GameOver implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public $turnId;
+    public $ids;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($id)
+    public function __construct($ids)
     {
-        $this->turnId = $id;
-        //
+        $this->ids = $ids;
     }
 
     /**
