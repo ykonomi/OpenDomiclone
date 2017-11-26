@@ -49,10 +49,6 @@ class UserTest extends TestCase
     public function testShow($hand, $expected)
     {
         
-        $this->assertEquals(1,1);
-        $user = new User;
-        //var_dump($user->show($hand));
-   //     $this->assertEquals($user->show($hand), $expected);
 
     }
 
@@ -108,6 +104,28 @@ class UserTest extends TestCase
         ];
     }
     
+
+    /**
+     *  @dataProvider playProvider
+     *
+     */
+    public function testPlay($target, $hands, $expected)
+    {
+        $user = new User();
+        $this->assertEquals($user->play($target, $hands),
+            $expected);
+    }
+    public function playProvider()
+    {
+        return [
+            [[0],[1,2,3,4,5],[[2,3,4,5],[1]]],
+            [[0,1],[1,2,3,4,5],[[3,4,5],[1,2]]],
+            [[0,1,2],[1,2,3,4,5],[[4,5],[1,2,3]]],
+            [[0,2],[1,2,3,4,5],[[2,4,5],[1,3]]],
+            [[3,4],[1,2,3,4,5],[[1,2,3],[4,5]]],
+        ];
+    }
+
 
     /**
      *  @dataProvider discardProvider
@@ -207,7 +225,6 @@ class UserTest extends TestCase
     /**
      *  @dataProvider drawProvider
      *
-        //異常系は考えない
      */
     public function testDraw($n, $deck, $discard, $expected)
     {
@@ -222,9 +239,29 @@ class UserTest extends TestCase
             [1,[1,2,3,4,5],[],[[5],[1,2,3,4],[]]],
             [1,[1,2,3,4,5],[1],[[5],[1,2,3,4],[1]]],
             [4,[1,2,3,4,5],[1],[[2,3,4,5],[1],[1]]],
-            [6,[1,2,3,4,5],[1],[[1,2,3,4,5,1],[],[]]],
+            [5,[1,2,3,4,5],[1],[[1,2,3,4,5],[],[1]]],
+            [6,[1,2,3,4,5],[1],[[1,1,2,3,4,5],[],[]]],
             //[6,[1,2,3,4,5],[1,2],[[1,2,3,4,5,2],[1],[]]],
         ];
     }
 
+    /**
+     *  @dataProvider calcProvider
+     *
+     */
+    public function testClacVictory($hands, $deck, $expected)
+    {
+        $user = new User();
+        $this->assertEquals($user->calcVictory($hands, $deck), $expected);
+    }
+    public function calcProvider()
+    {
+        return [
+            [[],[],0],
+            [[4],[],1],
+            [[],[4],1],
+            [[4,5],[4,5],8],
+            [[6,6,6,6],[4,5],28],
+        ];
+    }
 }

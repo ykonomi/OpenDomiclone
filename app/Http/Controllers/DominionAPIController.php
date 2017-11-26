@@ -3,22 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 use App\User;
 use App\Supply;
 use App\Card;
+use App\Trash;
 use App\Turn;
 use App\DummyTurn;
 
 class DominionAPIController extends Controller
 {
 
+    public function dummy()
+    {
+        
+    }
+
     /**
      * 　ゲームへ参加表明するメソッド.
      *   ターンテーブルに自分のidを追加する。
      *   そして、現時点での参加者idを参加者に通知する
+     *   
+     *   @param Resquest 
+     *   @return　
      */
     public function entry(Request $request)
     {
@@ -116,6 +126,18 @@ class DominionAPIController extends Controller
         //broadcast(new \App\Events\TurnChange($next_id));
     }
 
+    public function getHandsAndPlayArea()
+    {
+        $user = new User();
+        $hands = session('hand');
+        $playArea = session('play_area');
+        
+        return json_encode(['hands'    => $user->show($hands),
+                            'playarea' => $user->show($playArea)]);
+    }
+
+
+
     public function showHands()
     {
         $user = new User();
@@ -136,6 +158,12 @@ class DominionAPIController extends Controller
         $playArea = session('play_area');
         
         return json_encode(['ui' => $user->show($playArea)]);
+    }
+
+    public function showTrashes()
+    {
+        $trash = new Trash();
+        return json_encode(['ui' => $trash->show()]);
     }
 
     public function play($cardIndices)
@@ -210,29 +238,52 @@ class DominionAPIController extends Controller
         //アクションカードを場に置く
         $this->play([$index]);
 
-        //実際のアクション TODOリファクタリング
-        list($pcard, $paction, $pbuy, $pcoin) = $user->action($card_id);
-
-        $this->addActionCounts($paction);
-        $this->addBuyCounts($pbuy);
-        $this->addUserCoins($pcoin);
-
-        $hand_ = session('hand');
-        $deck = session('deck');
-        $discard = session('discard');
-
-        list ($hand, $deck, $discard) = $user->draw($pcard, $deck, $discard);
-        $hand = array_merge($hand_, $hand);
-        session(['deck' => $deck]);
-        session(['hand' => $hand]);
-        session(['discard' => $discard]); 
+        //plus系のアクション効果の処理
+        list($n, $plusAction, $plusBuy, $plusCoin) = $user->action($card_id);
+        $this->addActionCounts($plusAction);
+        $this->addBuyCounts($plusBuy);
+        $this->addUserCoins($plusCoin);
+        $this->drawWithSessions($n);
 
 
         $action_count =  session('action_count') - 1;
         session(['action_count' => $action_count]);
 
 
-        return json_encode(['action_count' => $action_count]);
+        //とりあえずここを肥やす
+        //魔女実装
+        if ($card_id == 29){
+            $card = new Card();
+            $this->attack($card->find($card_id));
+        //礼拝堂の実装。
+        } else if ($card_id == 12){
+            return json_encode(['action_count' => $action_count,
+                                'log'          => '廃棄するカードを４枚選択してください',
+                                'pattern'      => 1,
+                                'plus_buy' => $this->getUserCoins()]);
+        } else {
+            return json_encode(['action_count' => $action_count,
+                                'plus_buy' => $this->getUserCoins()]);
+        }
+    }
+
+    //とりあえず魔女のみ
+    public function attack($card)
+    {
+        broadcast(new \App\Events\Attack($card));
+        
+    }
+
+    public function drawWithSessions($n){
+        $user = new User();
+        $hand1 = session('hand');
+        $deck = session('deck');
+        $discard = session('discard');
+
+        list ($hand2, $deck, $discard) = $user->draw($n, $deck, $discard);
+
+        $hand = array_merge($hand1, $hand2);
+        session(['deck' => $deck, 'hand' => $hand, 'discard' => $discard]);
     }
 
 
@@ -280,31 +331,58 @@ class DominionAPIController extends Controller
         $cache = $user->estimate($hands) + $this->getUserCoins();
         $end = $card->find($cardId)->coin_cost;
 
-        return json_encode(['result' => $cache >= $end]);
+        //コストが0のとき
+        return json_encode(['result'  => $cache >= $end,
+            'is_zero' => $end === 0]);
 
     }
 
     public function checkSelectedCards(Request $request)
     {
-
-        $checks = $request->input('checks');
-        //空の時は終了
-        if(empty($checks)) return;
-
-        $card_id = (int) $request->input('id');
-
         $card = new Card();
+        $checks = $request->input('checks');
+        $buyId = (int) $request->input('id');
+
+        //validation (TODO laravelの力を使う)
+
+        //カードを選択していないとき 
+        //0金のカードなら、手札を消費しなくても買うことができる
+        if(empty($checks)){
+            if ($card->find($buyId)->card_cost == 0){
+                return json_encode(['result' => true,
+                    'log' => 'カードを購入しました']);
+            } else {
+                return json_encode(['result' => false,
+                    'log' => 'カードを選択してください']);
+            }
+        }
+
         $hands = session('hand');
+        //選択したカードにTreasureカード以外が混ざっているとき
+        //TODO のち複合カードにも対応できるようにする
+        foreach ($checks as $cardIdx) {
+            if($card->find($hands[(int) $cardIdx])->card_type != 'treasure'){
+                return json_encode(['result' => false,
+                    'log' => '財宝カード以外は使用できません']);
+            }
+        }
+
         $coin = 0;
         foreach ($checks as $idx) {
             $coin += $card->find($hands[(int) $idx])->coin;
         }
         $coin += $this->getUserCoins();
 
-        $end = $card->find($card_id)->coin_cost;
+        $end = $card->find($buyId)->coin_cost;
         
+        if ($end <= $coin){
+            return json_encode(['result' => true,
+                                'log' => 'カードを購入しました']);
+        } else {
+            return json_encode(['result' => false,
+                                'log' => 'コインが足りません']);
+        }
 
-        return json_encode(['result' => $end <= $coin]);
     }
 
     public function buy(Request $request)
@@ -312,68 +390,90 @@ class DominionAPIController extends Controller
         $user = new User();
 
         $checks = $request->input('checks');
-        //空の時は終了
-        if(empty($checks)) return;
-
+        $cardId = (int) $request->input('id');
+        //0金のカードを購入するとき
+        if(empty($checks)) {
+            //サプライの数から一枚減らす
+            $supply = new Supply();
+            $supply->draw($cardId);
+            //購入可能回数を1減らす
+            $buy_count =  session('buy_count') - 1;
+            session(['buy_count' => $buy_count]);
+            return json_encode(['buy_count' => $buy_count,
+                'is_gone' => $supply->isGone($cardId),
+                'card_id' => $cardId]);
+        }
+            
         //手札から購入に使うカードを取り除き、プレイエリアにだす
         $this->play($checks);
 
         //購入したカードを捨て札に置く
-        $cardId = (int) $request->input('id');
         $discard = session('discard');
         session(['discard' => $user->discard($cardId, $discard)]);
 
         //サプライの数から一枚減らす
         $supply = new Supply();
-        $isOver = $supply->draw($cardId);
+        $supply->draw($cardId);
 
         //ゲーム終了判定
-        if($isOver){
+        //サプライが一枚枯れた上で、終了条件を満たすか
+        if($supply->isGone($cardId) && $this->isOver($cardId)){
+            //comming soon ...
             //終了をブロードキャストする
-            broadcast(new \App\Events\GameOver());
-            $this->count();
+            //broadcast(new \App\Events\GameOver());
+            //return json_encode(['end' => true]);
         }
-        
+    
         //購入可能回数を1減らす
         $buy_count =  session('buy_count') - 1;
         session(['buy_count' => $buy_count]);
+        return json_encode(['buy_count' => $buy_count,
+            'is_gone' => $supply->isGone($cardId),
+            'card_id' => $cardId]);
+    }
 
-        return json_encode(['buy_count' => $buy_count]);
+    public function isOver($cardId){
+        $supply = new Supply();
+        $supply->isEmptyThreeTimes() || $cardId == 6;
     }
 
 
-    public function clean(Request $request)
+    public function clean()
     {
         $user = new User();
-        // play_areaのカードを捨てる
+        $hand = session('hand');
+        $deck = session('deck');
         $playArea = session('play_area');
         $discard = session('discard');
-        session(['discard'   => $user->discardArray($playArea, $discard),
-                 'play_area' => []]);
 
+        // play_areaのカードを捨てる
+        $discard = $user->discardArray($playArea, $discard);
         // 自分の手札を捨てる
-        $hand = session('hand');
-        $discard = session('discard');
-        session(['discard' => $user->discardArray($hand, $discard), 
-                 'hand'    => []]);
-
+        $discard = $user->discardArray($hand, $discard);
         // 山札から５枚手札に補充する   
-        $deck = session('deck');
-        $discard = session('discard');
         list ($hand, $deck, $discard) = $user->draw(5, $deck, $discard);
-        session(['deck' => $deck, 'hand' => $hand, 'discard' => $discard]);
+
+        Log::debug('a', ['deck' => $deck,
+            'hand' => $hand, 
+            'discard' => $discard,
+            'play_area' => []]);
+        session(['deck' => $deck,
+            'hand' => $hand, 
+            'discard' => $discard,
+            'play_area' => []]);
+
+
     }
 
-    public function total()
-    {
-        //手札の勝利点を集計する
-        //山札の勝利点を集計する
-        //脇に寄せた分の勝利点を集計する
-        
-    }
 
     public function exitGame()
     {
+        $user = new User();
+        $hands = session('hand');
+        $deck  = session('deck');
+
+        $vp = $user->calcVictory($hands, $deck);
+        //TODO to be implemented broadcast.
 
     }
 

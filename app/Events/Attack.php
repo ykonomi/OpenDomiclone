@@ -9,21 +9,20 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class Result implements ShouldBroadcastNow
+class Attack
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $ids;
 
+    private $card;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($ids)
+    public function __construct($card)
     {
-        $this->ids = $ids;
+        $this->card = $card
     }
 
     /**
@@ -33,6 +32,6 @@ class Result implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('channel-name');
+        return new PrivateChannel('channel-name');
     }
 }

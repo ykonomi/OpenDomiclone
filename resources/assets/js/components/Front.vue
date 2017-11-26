@@ -39,10 +39,9 @@ export default {
                 }
             })
         */
-        this.$store.dispatch('getHands').then(() => {
-            this.$store.dispatch('getSupplies').then(() => {
-                this.$store.dispatch('startActionPhase');
-            })});
+        this.$store.dispatch('getSupplies').then(() =>{
+            this.$store.dispatch('startActionPhase');
+        });
     },
     data: function () {
         return {

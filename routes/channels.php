@@ -12,8 +12,5 @@
 */
 
 Broadcast::channel('channel-name', function () {
-    //echo "a";
-    //return (int:) $user->id === (int) $id;
-    echo "asdsdsds";
     return true;
 });

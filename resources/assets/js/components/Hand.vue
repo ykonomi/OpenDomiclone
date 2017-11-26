@@ -11,6 +11,7 @@
                     class="btn btn-default"  @click="noAction"> アクションカードを使用しない</button>
             <button v-show="this.$store.getters.showBuyButton" 
                     class="btn btn-default"  @click="buy"> 購入する</button>
+            <selection v-show="this.$store.getters.showBuySelection" @trigger="touch"></selection>
         </div>
     </div>
 </template>
@@ -21,22 +22,28 @@ export default {
     methods: {
         click: function(value){
             switch(this.$store.getters.phase){
-                case 'action':
+                case 'Action':
                     this.$store.dispatch('isActionCard', value);
                     break;
-                case 'buy':
+                case 'Buy':
                     this.$store.commit('appearBuyButton');
                     this.$store.commit('addChecks', value);
+                    break;
+                case 'Chapel':
+                    this.$store.dispatch('tryChapel', value);
                     break;
             }
         },
         noAction: function(){
-            this.$store.dispatch('toNextPhase', 'prebuy');
+            this.$store.dispatch('startBuyPhase');
             this.$store.commit('disappearNoActionButton');
         },
         buy: function(){
             this.$store.dispatch('buy');
-        }
+        },
+        touch: function(){
+            this.$store.commit('appearBuyButton');
+        },
     }
 }
 </script>

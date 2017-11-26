@@ -37,11 +37,14 @@ Route::get('/init_child', 'DominionAPIController@initChild');
 Route::get('/start'      , 'DominionAPIController@start');
 
 Route::get('/get_name' ,  'DominionAPIController@getName');
+Route::get('/dummy' ,  'DominionAPIController@dummy');
 
 
 Route::get('/hands',     'DominionAPIController@showHands');
 Route::get('/supplies' , 'DominionAPIController@showSupplies');
 Route::get('/playarea' , 'DominionAPIController@showPlayArea');
+Route::get('/trashes',  'DominionAPIController@showTrashes');
+Route::get('/hands_and_playarea','DominionAPIController@getHandsAndPlayArea');
 
 
 Route::get('/action_phase/exist', 'DominionAPIController@containActionCards');

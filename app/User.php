@@ -192,6 +192,7 @@ class User extends Authenticatable
         
     }
 
+    //手札はカードID順でソートする
     public function draw($drawN, $deck, $discard)
     {
         if (!$this->canDrawInDeck($drawN, $deck)){
@@ -200,14 +201,32 @@ class User extends Authenticatable
             list($hand2, $deck2) = $this->drawOverDeck($drawN - $deckN, $discard);
             $newHands = array_merge($hand1, $hand2);
             $newDeck = array_merge($deck1, $deck2);
+            sort($newHands);
             return [$newHands, $newDeck, []];
         } else {
             list($hand, $deck) = $this->drawInDeck($drawN, $deck);
+            sort($hand);
             return [$hand, $deck, $discard];
         }
     }    
 
 
+    public function calcVictory($hands, $deck)
+    {
+        $total = 0;
+        $card = new Card();
+        //手札の勝利点を集計する
+        foreach ($hands as $card_id) {
+            $total += $card->find($card_id)->point;
+        }
+
+        //山札の勝利点を集計する
+        foreach ($deck as $card_id) {
+            $total += $card->find($card_id)->point;
+        }
+        //脇に寄せた分の勝利点を集計する(海辺以降)
+        return $total;
+    }
     
 
 }

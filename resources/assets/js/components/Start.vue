@@ -26,39 +26,38 @@ export default {
         }
     },
     created: function (){
+        console.log(this.mode);
         if (this.mode == 'production'){
             this.modal = true;
-            this.member++;
             this.ids.push(this.id);
             axios.get('/entry', {params : {id : this.id}})
 
-            Echo.channel('channel-name')
-                .listen('OtherEntry', (e) => {
-                    this.ids = e.ids;
-                    this.member = e.ids.length;
+            Echo.channel('channel-name').listen('OtherEntry', (e) => {
+                this.ids = e.ids;
+                console.log(this.ids);
 
-                    if (this.member === 2){
-                        this.message = '人数が揃いました!. 初期化中...!';
+                if (e.ids.length === 2){
+                    this.message = '人数が揃いました!. 初期化中...!';
 
-                        //TODO : 親の決め方 (今は最小のid)
-                        this.start_id = Math.min.apply(null, this.ids);
+                    //TODO : 親の決め方 (今は最小のid)
+                    this.start_id = Math.min.apply(null, this.ids);
 
-                        if (this.id === this.start_id){
-                            //親はゲーム全体の初期化もする
-                            axios.get('/init_parent', {params : {id : this.id}})
-                                .then(res => {
-                                    this.production = true;
-                                    this.modal = false;
-                                });
-                        } else {
-                            axios.get('/init_child', {params : {id : this.id}})
-                                .then(res => {
-                                    this.production = true;
-                                    this.modal = false;
-                                });
-                        }
+                    if (this.id === this.start_id){
+                        //親はゲーム全体の初期化もする
+                        axios.get('/init_parent', {params : {id : this.id}})
+                            .then(res => {
+                                this.production = true;
+                                this.modal = false;
+                            });
+                    } else {
+                        axios.get('/init_child', {params : {id : this.id}})
+                            .then(res => {
+                                this.production = true;
+                                this.modal = false;
+                            });
                     }
-                });
+                }
+            });
         } else if (this.mode == 'debug'){
             axios.all([
                 axios.get('/debug/entry', {params : {id : 1}}),

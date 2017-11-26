@@ -1,6 +1,6 @@
 <template>
     <label class="btn btn-defalut btn-extend" 
-           :class="{'card-active' : this.$store.getters.isActive}"
+           :class="{'card-active' : this.$store.getters.clearFocus}"
            @mouseenter="enter"
            @mouseleave="leave"
            @click="trigger">

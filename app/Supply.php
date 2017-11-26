@@ -35,8 +35,8 @@ class Supply extends Model
 
 
         //サプライの初期化(TODO ランダム化)
-        //31 29 25 19 17 15 1 2 3 4 5
-        $supplies = [31,29,25,19,17,15];
+        //$supplies = [8,9,10,11,12,13,14,15,16,18,19,31,25,20,21,23,24,26];
+        $supplies = [12, 31];
 
         foreach ($supplies as $id) {
             $card = $card_list->find($id);
@@ -45,7 +45,7 @@ class Supply extends Model
                 'coin_cost' => $card->coin_cost,
                 'card_type' => $card->card_type,
                 'description' => $card->description,
-                'rest' => 10
+                'rest' => 3 
             ]);
         }
     }
@@ -57,7 +57,7 @@ class Supply extends Model
         $result = [];
 
         foreach ($supplies as $card) {
-            if ($card->rest == 0) continue;
+            if ($card->is_gone) continue;
              $result += [$index => 
                ['id'   => $card->id, 
                 'name' => $card->name_jp, 
@@ -74,17 +74,17 @@ class Supply extends Model
     {
         $card = $this->find($cardId);
         $rest = $card->rest - 1;
-        if ($rest == 0){
-            //ゲーム終了
-            if ($cardId == 6 || $this->isEmptyThreeTimes){
-                return true;
-            }
-        }
-
+        if ($rest <= 0) $card->is_gone = true;
         $card->rest = $rest;
         $card->save();
+    }
         
-        return false;
+
+    public function isGone($cardId)
+    {
+        $card = $this->find($cardId);
+        return $card->is_gone;
+        
     }
 
     public function isEmptyThreeTimes()

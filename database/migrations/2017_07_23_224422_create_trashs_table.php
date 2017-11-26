@@ -13,10 +13,13 @@ class CreateTrashsTable extends Migration
      */
     public function up()
     {
-        Schema::create('trashs', function (Blueprint $table) {
+        Schema::create('trashes', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('card_id');
-            $table->timestamps();
+            $table->string('name_jp', 100);
+            $table->integer('coin_cost');
+            $table->string('card_type', 100);
+            $table->string('description', 200);
         });
     }
 
@@ -27,6 +30,6 @@ class CreateTrashsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('trashs');
+        Schema::dropIfExists('trashes');
     }
 }

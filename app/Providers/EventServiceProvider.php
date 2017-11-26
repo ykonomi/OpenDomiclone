@@ -16,6 +16,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\OtherEntry' => [
             'App\Listeners\OtherEntryListener',
         ],
+        'App\Events\Attack' => [
+            'App\Listeners\AttackListener',
+        ],
         'App\Events\TurnChange' => [
             'App\Listeners\TurnChangeListener',
         ],
@@ -27,7 +30,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\Result' => [
             'App\Listeners\Result',
-        ],
+        ]
     ];
 
     /**

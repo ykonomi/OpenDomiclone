@@ -26,6 +26,7 @@ Vue.component('front', require('./components/Front.vue'));
 
 Vue.component('card', require('./components/Card.vue'));
 Vue.component('balloon', require('./components/Balloon.vue'));
+Vue.component('selection', require('./components/Selection.vue'));
 
 Vue.component('hand', require('./components/Hand.vue'));
 Vue.component('supply', require('./components/Supply.vue'));
@@ -44,7 +45,10 @@ Vue.component('log', require('./components/Log.vue'));
 
 import phase from './store/modules/phase'
 import log from './store/modules/log'
-import game from './store/modules/game'
+import action_phase from './store/modules/action_phase'
+import buy_phase from './store/modules/buy_phase'
+import clean_phase from './store/modules/clean_phase'
+import player from './store/modules/player'
 import Vuex from 'vuex'
 
 
@@ -52,7 +56,10 @@ const store = new Vuex.Store({
   modules: {
       phase,
       log,
-      game,
+      player,
+      action_phase,
+      buy_phase,
+      clean_phase,
   },
   strict: true,
 })

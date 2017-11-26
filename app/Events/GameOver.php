@@ -11,8 +11,6 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-use App\Turn;
-
 class GameOver implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
