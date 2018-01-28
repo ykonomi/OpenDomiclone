@@ -3,6 +3,7 @@
 const state = {
     buyId: 0,
     showBuyButton: false,
+    showNoBuyButton: false,
     selected: 0,
     plusBuy: [],
     showBuySelection: false
@@ -10,6 +11,7 @@ const state = {
 
 const getters = {
     showBuyButton: state => state.showBuyButton,
+    showNoBuyButton: state => state.showNoBuyButton,
     showBuySelection: state => state.showBuySelection,
     plusBuy: state => state.plusBuy,
     selected: state => state.selected,
@@ -20,6 +22,7 @@ const actions = {
     startBuyPhase({commit, dispatch}){
         dispatch('resetHandsAndPlayArea').then(() => {
             commit('appearBuySelection');
+            commit('appearNoBuyButton');
             dispatch('updateLog', "購入するカードを選択してください。");
             dispatch('toNextPhase', 'BeforeBuy');
         });
@@ -27,7 +30,7 @@ const actions = {
     selectCards({commit, dispatch}, buyId){
         dispatch('clearCheckedCards').then(() => {
             commit('disappearBuyButton');
-            commit('register', buyId);
+            commit('registerBuyId', buyId);
             dispatch('estimate', buyId).then(res => {
                 if (res.data.result){
                     commit('update', "財宝カードを選択してください。");
@@ -48,15 +51,21 @@ const actions = {
         dispatch('isChecked').then(res => {
             if (res.data.result) {
                 var checks = rootState.player.checks;
-                axios.get('/buy_phase/buy', {params: {checks: checks, id: state.buyId}}).then(res => {
+                //plusBuy -> plusCoinではない
+                axios.get('/buy_phase/buy', {params: {checks: checks, id: state.buyId, plusBuy: state.selected}}).then(res => {
                     commit('disappearBuyButton');
                     commit('disappearBuySelection');
                     if (res.data.is_gone){
                         dispatch('getSupplies');
                     }
                     if (res.data.buy_count != 0){
-                        dispatch('startBuyPhase');
+                        commit('setupBuySelection', res.data.rest_coin);
+                        Vue.nextTick(() => {
+                            dispatch('startBuyPhase');
+                            //commit('appearBuySelection');
+                        });
                     } else {
+                        commit('disappearNoBuyButton');
                         dispatch('startCleanUpPhase');
                     }
 
@@ -67,7 +76,7 @@ const actions = {
     },
     isChecked({commit, dispatch, rootState}){
         var checks = rootState.player.checks;
-        return axios.get('/buy_phase/check', {params: {checks: checks, id: state.buyId}});
+        return axios.get('/buy_phase/check', {params: {checks: checks, id: state.buyId, plusBuy: state.selected}});
 
     },
 }
@@ -79,6 +88,12 @@ const mutations = {
     },
     disappearBuyButton (state) {
         state.showBuyButton = false;
+    },
+    appearNoBuyButton (state) {
+        state.showNoBuyButton = true;
+    },
+    disappearNoBuyButton (state) {
+        state.showNoBuyButton = false;
     },
     appearBuySelection (state) {
         if (state.plusBuy.length > 1){
@@ -95,8 +110,11 @@ const mutations = {
             state.plusBuy.push(i);
         }
     },
-    register(state, id){
+    registerBuyId(state, id){
         state.buyId = id;
+    },
+    selectOption(state, selected){
+        state.selected = selected;
     }
 }
 

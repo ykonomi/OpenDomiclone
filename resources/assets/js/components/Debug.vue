@@ -10,7 +10,7 @@
         <div> +coin : {{ coin }}</div>
         <div> +action : {{ action_count }}</div>
         <div> +buy : {{ buy_count }}</div>
-        <h2> 開発版 - ver 0.98 - </h2>
+        <h2> 開発版 - ver 0.85 - </h2>
     </div>
 </template>
 

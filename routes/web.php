@@ -11,59 +11,57 @@
 |
 */
 
+Route::get('/', 'Auth\LoginController@showLoginForm');
+Route::get('login', 'Auth\LoginController@showLoginForm');
+Route::post('login', 'Auth\LoginController@login')->name('login');
 
-Auth::routes();
-//Broadcast::routes();
+Route::get('logout', 'Auth\LoginController@logout');
+Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::get('/', 'HomeController@index')->name('home');
-Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/logout', 'Auth\LoginController@logout');
+Route::get('/debug', function (){
+    return view('debug');
+});
 
 Route::get('/main',  function (){
     return view('main');
 });
-Route::get('/offline' , function (){
-    return view('debug');
-});
-Route::get('/test' , function (){
-    return view('test');
-});
-
-Route::get('/entry', 'DominionAPIController@entry');
-
-Route::get('/init_parent', 'DominionAPIController@initParent');
-Route::get('/init_child', 'DominionAPIController@initChild');
-
-Route::get('/start'      , 'DominionAPIController@start');
-
-Route::get('/get_name' ,  'DominionAPIController@getName');
-Route::get('/dummy' ,  'DominionAPIController@dummy');
 
 
-Route::get('/hands',     'DominionAPIController@showHands');
-Route::get('/supplies' , 'DominionAPIController@showSupplies');
-Route::get('/playarea' , 'DominionAPIController@showPlayArea');
-Route::get('/trashes',  'DominionAPIController@showTrashes');
-Route::get('/hands_and_playarea','DominionAPIController@getHandsAndPlayArea');
+Route::get('/entry', 'GameController@entry');
+
+Route::get('/init_parent', 'GameController@initParent');
+Route::get('/init_child', 'GameController@initChild');
+
+Route::get('/start'      , 'GameController@start');
+
+Route::get('/get_name' ,  'GameController@getName');
+Route::get('/dummy' ,  'GameController@dummy');
 
 
-Route::get('/action_phase/exist', 'DominionAPIController@containActionCards');
-Route::get('/action_phase/is_action', 'DominionAPIController@isActionCards');
-Route::get('/action_phase/action', 'DominionAPIController@action');
+Route::get('/hands',     'GameController@showHands');
+Route::get('/supplies' , 'GameController@showSupplies');
+Route::get('/playarea' , 'GameController@showPlayArea');
+Route::get('/trashes',  'GameController@showTrashes');
+Route::get('/hands_and_playarea','GameController@getHandsAndPlayArea');
 
-Route::get('/buy_phase/estimate' ,  'DominionAPIController@estimate');
-Route::get('/buy_phase/hands' ,  'DominionAPIController@showHands');
-Route::get('/buy_phase/check' ,  'DominionAPIController@checkSelectedCards');
-Route::get('/buy_phase/buy' ,  'DominionAPIController@buy');
 
-Route::get('/clean' ,  'DominionAPIController@clean');
-Route::get('/turn_end', 'DominionAPIController@exitTurn');
-//Route::get('/lottery', 'DominionAPIController@lottery');
+Route::get('/action_phase/exist', 'GameController@containActionCards');
+Route::get('/action_phase/is_action', 'GameController@isActionCards');
+Route::get('/action_phase/action', 'GameController@action');
+
+Route::get('/buy_phase/estimate' ,  'GameController@estimate');
+Route::get('/buy_phase/hands' ,  'GameController@showHands');
+Route::get('/buy_phase/check' ,  'GameController@checkSelectedCards');
+Route::get('/buy_phase/buy' ,  'GameController@buy');
+
+Route::get('/clean' ,  'GameController@clean');
+Route::get('/turn_end', 'GameController@exitTurn');
+//Route::get('/lottery', 'GameController@lottery');
 
 //for debug
 Route::get('/init_playdata', 'DebugController@init');
 
-Route::get('/debug/entry', 'DominionAPIController@entryOffline');
+Route::get('/debug/entry', 'GameController@entryOffline');
 Route::get('/debug/id' ,     'DebugController@get_id');
 Route::get('/debug/hand' ,   'DebugController@get_hand');
 Route::get('/debug/deck',    'DebugController@get_deck');
@@ -75,18 +73,3 @@ Route::get('/debug/buy_counts'   ,'DebugController@get_buy_counts');
 
 
 
-//+--------+----------+------------------------+------------------+------------------------------------------------------------------------+--------------+
-//|        | GET|HEAD | /                      |                  | Closure                                                                | web          |
-//|        | GET|HEAD | api/user               |                  | Closure                                                                | api,auth:api |
-//|        | GET|HEAD | home                   | home             | App\Http\Controllers\HomeController@index                              | web,auth     |
-//|        | GET|HEAD | login                  | login            | App\Http\Controllers\Auth\LoginController@showLoginForm                | web,guest    |
-//|        | POST     | login                  |                  | App\Http\Controllers\Auth\LoginController@login                        | web,guest    |
-//|        | POST     | logout                 | logout           | App\Http\Controllers\Auth\LoginController@logout                       | web          |
-//|        | GET|HEAD | logout                 |                  | App\Http\Controllers\Auth\LoginController@logout                       | web          |
-//|        | POST     | password/email         | password.email   | App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail  | web,guest    |
-//|        | GET|HEAD | password/reset         | password.request | App\Http\Controllers\Auth\ForgotPasswordController@showLinkRequestForm | web,guest    |
-//|        | POST     | password/reset         |                  | App\Http\Controllers\Auth\ResetPasswordController@reset                | web,guest    |
-//|        | GET|HEAD | password/reset/{token} | password.reset   | App\Http\Controllers\Auth\ResetPasswordController@showResetForm        | web,guest    |
-//|        | GET|HEAD | register               | register         | App\Http\Controllers\Auth\RegisterController@showRegistrationForm      | web,guest    |
-//|        | POST     | register               |                  | App\Http\Controllers\Auth\RegisterController@register                  | web,guest    |
-//+--------+----------+------------------------+------------------+------------------------------------------------------------------------+--------------+

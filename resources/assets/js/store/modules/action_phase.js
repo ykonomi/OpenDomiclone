@@ -11,13 +11,12 @@ const getters = {
 const actions = {
     startActionPhase ({commit, dispatch}){
         dispatch('resetHandsAndPlayArea').then(() => {
-            dispatch('exist').then((res) => {
+            dispatch('exist').then(res => {
+                commit('update', res.data.log);
                 if (res.data.result){
-                    commit('update', "アクションカードを選択してね。");
                     commit('appearNoActionButton');
                     dispatch('toNextPhase', 'Action');
                 } else {
-                    commit('update', "アクションカードがないため、フェイズを飛ばします。");
                     commit('disappearNoActionButton');
                     dispatch('startBuyPhase');
                 }
@@ -28,14 +27,13 @@ const actions = {
         return axios.get('/action_phase/exist');
     },
     isActionCard({commit, dispatch}, index){
-        return axios.get('/action_phase/is_action', {params: {idx : index}}).then(res => {
-            if (res.data.result){
-                commit('update', "アクションカードをプレイします。");
-                dispatch('action', index);
-            } else {
-                commit('update', 'それはアクションカードではありません。');
-            }
-        });
+        return axios.get('/action_phase/is_action', 
+            {params: {idx : index}}).then(res => {
+                commit('update', res.data.log);
+                if (res.data.result){
+                    dispatch('action', index);
+                }
+            });
     },
     action({commit, dispatch}, index){
         return axios.get('/action_phase/action', {params: {idx : index}}).then(res => {

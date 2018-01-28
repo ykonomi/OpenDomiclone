@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use App\User;
 
-class DominionAPIUnitTest extends TestCase
+class GameUnitTest extends TestCase
 {
     public function testEntry()
     {

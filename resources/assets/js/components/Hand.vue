@@ -11,6 +11,8 @@
                     class="btn btn-default"  @click="noAction"> アクションカードを使用しない</button>
             <button v-show="this.$store.getters.showBuyButton" 
                     class="btn btn-default"  @click="buy"> 購入する</button>
+            <button v-show="this.$store.getters.showNoBuyButton" 
+                    class="btn btn-default"  @click="noBuy"> 購入しない</button>
             <selection v-show="this.$store.getters.showBuySelection" @trigger="touch"></selection>
         </div>
     </div>
@@ -38,11 +40,16 @@ export default {
             this.$store.dispatch('startBuyPhase');
             this.$store.commit('disappearNoActionButton');
         },
+        noBuy: function(){
+            this.$store.dispatch('startCleanUpPhase');
+            this.$store.commit('disappearNoBuyButton');
+        },
         buy: function(){
             this.$store.dispatch('buy');
         },
-        touch: function(){
+        touch: function(selected){
             this.$store.commit('appearBuyButton');
+            this.$store.commit('selectOption', selected);
         },
     }
 }

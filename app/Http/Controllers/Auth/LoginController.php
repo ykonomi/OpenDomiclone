@@ -27,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/main';
 
     /**
      * Create a new controller instance.
@@ -37,6 +37,11 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function username()
+    {
+        return 'name';
     }
 
     /**
@@ -51,9 +56,9 @@ class LoginController extends Controller
 
         if (Auth::attempt(['name' => $name, 'password' => $password])) {
             // 認証に成功した
-            return redirect('/home');
+            return redirect('/main');
         } else {
-            return redirect('/home');
+            return redirect('/main');
         }
     }
 
@@ -61,6 +66,6 @@ class LoginController extends Controller
     {
         Auth::logout();
 
-        return redirect('/home');
+        return redirect('/login');
     }
 }

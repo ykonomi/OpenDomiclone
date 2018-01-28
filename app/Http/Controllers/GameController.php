@@ -14,7 +14,7 @@ use App\Trash;
 use App\Turn;
 use App\DummyTurn;
 
-class DominionAPIController extends Controller
+class GameController extends Controller
 {
 
     public function dummy()
@@ -132,8 +132,8 @@ class DominionAPIController extends Controller
         $hands = session('hand');
         $playArea = session('play_area');
         
-        return json_encode(['hands'    => $user->show($hands),
-                            'playarea' => $user->show($playArea)]);
+        return ['hands'    => $user->show($hands),
+            'playarea' => $user->show($playArea)];
     }
 
 
@@ -143,13 +143,13 @@ class DominionAPIController extends Controller
         $user = new User();
         $hands = session('hand');
         
-        return json_encode(['ui' => $user->show($hands)]);
+        return ['ui' => $user->show($hands)];
     }
 
     public function showSupplies(Request $request)
     {
         $supply = new Supply();
-        return json_encode(['ui' => $supply->show()]);
+        return ['ui' => $supply->show()];
     }
 
     public function showPlayArea()
@@ -157,13 +157,13 @@ class DominionAPIController extends Controller
         $user = new User();
         $playArea = session('play_area');
         
-        return json_encode(['ui' => $user->show($playArea)]);
+        return (['ui' => $user->show($playArea)]);
     }
 
     public function showTrashes()
     {
         $trash = new Trash();
-        return json_encode(['ui' => $trash->show()]);
+        return (['ui' => $trash->show()]);
     }
 
     public function play($cardIndices)
@@ -181,7 +181,15 @@ class DominionAPIController extends Controller
         $user = new User();
         $hands = session('hand');
 
-        return json_encode(['result' => $user->hasActionCardIn($hands)]);
+        $result = $user->hasActionCardIn($hands);
+
+        if ($result){
+            $log = 'アクションカードを選択してね。';
+        } else {
+            $log = 'アクションカードがないため、フェイズを飛ばします。';
+        }
+
+        return ['result' => $result, 'log' => $log];
     }
 
 
@@ -195,7 +203,15 @@ class DominionAPIController extends Controller
 
         $cardList = new Card();
         $card_type = $cardList->find($card_id)->card_type;
-        return json_encode(['result' => $cardList->isAction($card_type)]);
+
+        $result = $cardList->isAction($card_type);
+
+        if ($result) {
+            $log = 'アクションカードをプレイします。';
+        } else {
+            $log = 'それはアクションカードではありません。';
+        }
+        return ['result' => $result, 'log' => $log];
     }
 
     /**
@@ -257,13 +273,13 @@ class DominionAPIController extends Controller
             $this->attack($card->find($card_id));
         //礼拝堂の実装。
         } else if ($card_id == 12){
-            return json_encode(['action_count' => $action_count,
-                                'log'          => '廃棄するカードを４枚選択してください',
-                                'pattern'      => 1,
-                                'plus_buy' => $this->getUserCoins()]);
+            return ['action_count' => $action_count,
+                'log'          => '廃棄するカードを４枚選択してください',
+                'pattern'      => 1,
+                'plus_buy' => $this->getUserCoins()];
         } else {
-            return json_encode(['action_count' => $action_count,
-                                'plus_buy' => $this->getUserCoins()]);
+            return ['action_count' => $action_count,
+                'plus_buy' => $this->getUserCoins()];
         }
     }
 
@@ -313,6 +329,11 @@ class DominionAPIController extends Controller
         $coin = session('coin');
         session(['coin' => $coin + $n]);
     }
+
+    private function subUserCoins($n){
+        $coin = session('coin');
+        session(['coin' => $coin - $n]);
+    }
     
     private function getUserCoins()
     {
@@ -332,7 +353,7 @@ class DominionAPIController extends Controller
         $end = $card->find($cardId)->coin_cost;
 
         //コストが0のとき
-        return json_encode(['result'  => $cache >= $end,
+        return (['result'  => $cache >= $end,
             'is_zero' => $end === 0]);
 
     }
@@ -342,19 +363,14 @@ class DominionAPIController extends Controller
         $card = new Card();
         $checks = $request->input('checks');
         $buyId = (int) $request->input('id');
+        $plusBuy = (int) $request->input('plusBuy'); 
 
         //validation (TODO laravelの力を使う)
+        //$plusBuy <= $this->getUserCoins();
 
-        //カードを選択していないとき 
-        //0金のカードなら、手札を消費しなくても買うことができる
-        if(empty($checks)){
-            if ($card->find($buyId)->card_cost == 0){
-                return json_encode(['result' => true,
-                    'log' => 'カードを購入しました']);
-            } else {
-                return json_encode(['result' => false,
-                    'log' => 'カードを選択してください']);
-            }
+        //コスト0のカードを選択したとき
+        if(empty($checks) && $card->find($buyId)->card_cost == 0){
+            return (['result' => true, 'log' => 'カードを購入しました']);
         }
 
         $hands = session('hand');
@@ -362,7 +378,7 @@ class DominionAPIController extends Controller
         //TODO のち複合カードにも対応できるようにする
         foreach ($checks as $cardIdx) {
             if($card->find($hands[(int) $cardIdx])->card_type != 'treasure'){
-                return json_encode(['result' => false,
+                return (['result' => false,
                     'log' => '財宝カード以外は使用できません']);
             }
         }
@@ -371,15 +387,15 @@ class DominionAPIController extends Controller
         foreach ($checks as $idx) {
             $coin += $card->find($hands[(int) $idx])->coin;
         }
-        $coin += $this->getUserCoins();
+        $coin += $plusBuy;// $this->getUserCoins();
 
         $end = $card->find($buyId)->coin_cost;
         
         if ($end <= $coin){
-            return json_encode(['result' => true,
+            return (['result' => true,
                                 'log' => 'カードを購入しました']);
         } else {
-            return json_encode(['result' => false,
+            return (['result' => false,
                                 'log' => 'コインが足りません']);
         }
 
@@ -391,22 +407,16 @@ class DominionAPIController extends Controller
 
         $checks = $request->input('checks');
         $cardId = (int) $request->input('id');
-        //0金のカードを購入するとき
-        if(empty($checks)) {
-            //サプライの数から一枚減らす
-            $supply = new Supply();
-            $supply->draw($cardId);
-            //購入可能回数を1減らす
-            $buy_count =  session('buy_count') - 1;
-            session(['buy_count' => $buy_count]);
-            return json_encode(['buy_count' => $buy_count,
-                'is_gone' => $supply->isGone($cardId),
-                'card_id' => $cardId]);
+        $plusBuy = (int) $request->input('plusBuy'); 
+        $coin = $this->getUserCoins(); 
+
+    
+        //+金で買うか、コスト0のカードを買うとき 
+        if(!empty($checks)) {
+            //手札から購入に使うカードを取り除き、プレイエリアにだす
+            $this->play($checks);
         }
             
-        //手札から購入に使うカードを取り除き、プレイエリアにだす
-        $this->play($checks);
-
         //購入したカードを捨て札に置く
         $discard = session('discard');
         session(['discard' => $user->discard($cardId, $discard)]);
@@ -415,21 +425,25 @@ class DominionAPIController extends Controller
         $supply = new Supply();
         $supply->draw($cardId);
 
+        //+金を減らす
+        $this->subUserCoins($plusBuy); 
+
         //ゲーム終了判定
         //サプライが一枚枯れた上で、終了条件を満たすか
         if($supply->isGone($cardId) && $this->isOver($cardId)){
             //comming soon ...
             //終了をブロードキャストする
             //broadcast(new \App\Events\GameOver());
-            //return json_encode(['end' => true]);
+            //return (['end' => true]);
         }
     
         //購入可能回数を1減らす
         $buy_count =  session('buy_count') - 1;
         session(['buy_count' => $buy_count]);
-        return json_encode(['buy_count' => $buy_count,
+        return (['buy_count' => $buy_count,
             'is_gone' => $supply->isGone($cardId),
-            'card_id' => $cardId]);
+            'card_id' => $cardId,
+            'rest_coin' => $coin - $plusBuy]);
     }
 
     public function isOver($cardId){
