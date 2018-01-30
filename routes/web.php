@@ -20,14 +20,26 @@ Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('/debug', function (){
     return view('debug');
-});
+})->middleware('auth');
+
+Route::get('/entry',  function (){
+    return view('entry');
+})->middleware('auth');
 
 Route::get('/main',  function (){
     return view('main');
+})->middleware('auth');
+
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::post('/games', 'GameController@create');
+    Route::post('/users', 'UserController@create');
 });
 
 
-Route::get('/entry', 'GameController@entry');
+
+//Route::get('/entry', 'GameController@entry');
+
 
 Route::get('/init_parent', 'GameController@initParent');
 Route::get('/init_child', 'GameController@initChild');

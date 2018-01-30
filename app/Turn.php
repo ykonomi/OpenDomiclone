@@ -10,6 +10,18 @@ class Turn extends Model
         'id', 'user_id'
     ];
 
+    public function init()
+    {
+        $this->truncate();
+        shuffle([1,2]);
+
+        foreach ($ids as $id) {
+            $turn = new Turn(); //foreachのたびにnewしないとsaveされないみたい
+            $turn->user_id = $id;
+            $turn->save();
+        }
+        
+    }
     /**
      *   参加者全てのidを取得する
      */

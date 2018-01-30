@@ -35,6 +35,6 @@ class OtherEntry implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('channel-name');
+        return new PresenceChannel('channel-name');
     }
 }

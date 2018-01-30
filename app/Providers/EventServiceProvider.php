@@ -30,6 +30,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\Result' => [
             'App\Listeners\Result',
+        ],
+        'App\Events\SettingCompleted' => [
+            'App\Listeners\SettingCompleted',
         ]
     ];
 

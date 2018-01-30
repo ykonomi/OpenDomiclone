@@ -20,7 +20,7 @@ window.Vue.use(require('vuex'));
 
 Vue.component('navbar', require('./components/Navbar.vue'));
 
-Vue.component('start', require('./components/Start.vue'));
+Vue.component('entry', require('./components/Entry.vue'));
 Vue.component('front', require('./components/Front.vue'));
 
 
@@ -35,10 +35,8 @@ Vue.component('trash', require('./components/Trash.vue'));
 Vue.component('public', require('./components/Public.vue'));
 
 
-Vue.component('modal', require('./components/Modal.vue'));
 Vue.component('debug', require('./components/Debug.vue'));
 
-Vue.component('ui-test', require('./components/UItest.vue'));
 Vue.component('log', require('./components/Log.vue'));
 
 

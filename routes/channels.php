@@ -11,6 +11,15 @@
 |
 */
 
-Broadcast::channel('channel-name', function () {
-    return true;
+Broadcast::channel('to-entry-game', function ($user) {
+    return ['id' => $user->id, 'name' => $user->name];
 });
+
+//Broadcast::channel('channel-name', function ($user, $roomId) {
+//});
+
+//    if ($user->canJoinRoom($roomId)) {
+//        return ['id' => $user->id, 'name' => $user->name];
+//    } else {
+//        return false;
+//    }

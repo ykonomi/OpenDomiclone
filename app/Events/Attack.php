@@ -22,7 +22,7 @@ class Attack
      */
     public function __construct($card)
     {
-        $this->card = $card
+        $this->card = $card;
     }
 
     /**

@@ -30,6 +30,7 @@ class GameController extends Controller
      *   @param Resquest 
      *   @return　
      */
+    // @deprecated
     public function entry(Request $request)
     {
         $id = (int) $request->get('id');
@@ -41,6 +42,7 @@ class GameController extends Controller
         broadcast(new \App\Events\OtherEntry($turnTable->getEntries()));
     }
 
+    // @deprecated
     public function entryOffline(Request $request)
     {
         $id = (int) $request->get('id');
@@ -50,20 +52,39 @@ class GameController extends Controller
     }
 
 
+    public function create()
+    {
+        $supply = new Supply();
+        $supply->init();
+
+        $turnTable = new Turn();
+        $turnTable->init();
+
+        broadcast(new \App\Events\SettingCompleted());
+    }
+
+    // @deprecated
     public function initParent(Request $request)
     {
         $id = $request->get('id');
         $this->initTurn();
-        $this->initUser($id);
-        
+        //$this->initUser($id);
+        $turnTable = new DummyTurn();
+
+        //$turnTable->add($id);
+        broadcast(new \App\Events\SettingCompleted(1));
+        //broadcast(new \App\Events\OtherEntry(1));
+
     }
 
+    // @deprecated
     public function initChild(Request $request)
     {
         $id = $request->get('id');
         $this->initUser($id);
     }
 
+    // @deprecated
     public function getName(Request $request)
     {
         $user = new User();
@@ -78,6 +99,7 @@ class GameController extends Controller
      *  サプライの初期化とターンテーブルの初期化を行う。
      *  ターンテーブルの初期化はシャッフルで行う
      */
+    // @deprecated
     private function initTurn()
     {
         $supply = new Supply();
@@ -93,7 +115,8 @@ class GameController extends Controller
     }
 
     //プレイヤーの山札、手札、捨て札、プレイエリアを初期化
-    private function initUser($id)
+    // @deprecated
+    private function initUser()
     {
         $user = new User();
 

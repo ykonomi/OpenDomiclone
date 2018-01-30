@@ -1,4 +1,4 @@
 @extends('layouts.app')
 @section('content')
-<start mode="debug"></start>
+<front mode="debug"></front>
 @endsection

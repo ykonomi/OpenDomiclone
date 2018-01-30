@@ -19,29 +19,47 @@
 
 <script>
 export default {
-    props: ['my_id', 'start_id'],
-    created: function (){
-        if (this.my_id == this.start_id){
-            this.$store.dispatch('toNextPhase', 'action');
-            //alert("あなたのターンです。");
-        } else {
-            axios.get('/get_name', {params : {id : this.start_id}})
-                .then(res => {
-                    this.$store.dispatch('updateLog', res.data + 'のターンです。');
-                });
+    props: ['mode'],
+    data: function (){
+        return { 
         }
-        /*
-        Echo.channel('channel-name')
-            .listen('TurnChange', (e) => {
-                this.who_turn = e.turn_id;
-                if (this.my_id == e.turn_id){
-                    this.$store.dispatch('toNextPhase', 'action');
-                }
-            })
-        */
-        this.$store.dispatch('getSupplies').then(() =>{
-            this.$store.dispatch('startActionPhase');
-        });
+    },
+    created: function (){
+        if (this.mode !== 'debug'){
+            Echo.join('game')
+                .here((users) => {
+                    axios.get('/turns/search').then(e => {
+                        if (e.data){
+                            this.$store.dispatch('getSupplies').then(() =>{
+                                this.$store.dispatch('toNextPhase', 'action');
+                                this.$store.dispatch('startActionPhase');
+                            });
+                            this.$store.dispatch('toNextPhase', 'action');
+
+                        } else {
+                            this.$store.dispatch('getSupplies').then(() =>{
+                                this.$store.dispatch('startActionPhase');
+                            });
+                        }
+                    });
+                })
+                .joining((user) => {
+                })
+                .leaving((user) => {
+                    console.log(user.name + 'がゲームから離れました');
+                })
+                .listen('TurnChanged', (e) => {
+                    this.who_turn = e.turn_id;
+                    if (this.my_id == e.turn_id){
+                        this.$store.dispatch('toNextPhase', 'action');
+                    }
+                })
+
+        } else {
+            this.$store.dispatch('getSupplies').then(() =>{
+                this.$store.dispatch('startActionPhase');
+            });
+        }
     },
     data: function () {
         return {

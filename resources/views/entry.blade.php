@@ -1,4 +1,4 @@
 @extends('layouts.app')
 @section('content')
-<manage></manage>
+<entry></entry>
 @endsection

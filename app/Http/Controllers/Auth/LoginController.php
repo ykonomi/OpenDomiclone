@@ -27,8 +27,11 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/main';
 
+    protected function redirectTo()
+    {
+        return '/entry';
+    }
     /**
      * Create a new controller instance.
      *
@@ -49,23 +52,16 @@ class LoginController extends Controller
      *
      * @return Response
      */
-    public function login(Request $request)
+    public function authenticate()
     {
-        $name     = $request->input('name');
-        $password = $request->input('password');
-
         if (Auth::attempt(['name' => $name, 'password' => $password])) {
-            // 認証に成功した
-            return redirect('/main');
-        } else {
-            return redirect('/main');
+            return redirect();
         }
     }
 
     public function logout()
     {
         Auth::logout();
-
-        return redirect('/login');
+        return redirect('/');
     }
 }
