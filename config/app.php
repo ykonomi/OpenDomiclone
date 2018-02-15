@@ -160,6 +160,7 @@ return [
         Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
 
         Illuminate\Session\SessionServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
         //Rairlie\LockingSession\LockingSessionServiceProvider::class,
 
         Illuminate\Translation\TranslationServiceProvider::class,
@@ -229,6 +230,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        'Debugbar' => Barryvdh\Debugbar\Facade::class,
     ],
 
 ];
