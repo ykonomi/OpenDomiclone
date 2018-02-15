@@ -32,6 +32,7 @@ export default {
                     console.log(user.name + 'がゲームから離れました');
                 })
                 .listen('TurnChanged', (e) => {
+                    console.log('a');
                     this.$store.dispatch('start');
                 })
         } else {

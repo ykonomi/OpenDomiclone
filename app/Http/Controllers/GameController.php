@@ -143,17 +143,6 @@ class GameController extends Controller
 
     }
 
-    public function exitTurn(Request $request)
-    {
-        session(['coin' => 0]);
-        session(['action_count' => 1]);
-        session(['buy_count'    => 1]);
-
-        $id = $request->input('id');
-        $turnTable = new Turn();
-        //$next_id = $turnTable->next($id);
-        //broadcast(new \App\Events\TurnChange($next_id));
-    }
 
     public function getHandsAndPlayArea()
     {
@@ -502,16 +491,14 @@ class GameController extends Controller
         // 山札から５枚手札に補充する   
         list ($hand, $deck, $discard) = $user->draw(5, $deck, $discard);
 
-        Log::debug('a', ['deck' => $deck,
-            'hand' => $hand, 
-            'discard' => $discard,
-            'play_area' => []]);
         session(['deck' => $deck,
             'hand' => $hand, 
             'discard' => $discard,
             'play_area' => []]);
 
-
+        session(['coin' => 0]);
+        session(['action_count' => 1]);
+        session(['buy_count'    => 1]);
     }
 
 

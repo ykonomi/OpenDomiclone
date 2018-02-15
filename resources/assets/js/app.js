@@ -18,8 +18,6 @@ window.Vue.use(require('vuex'));
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('navbar', require('./components/Navbar.vue'));
-
 Vue.component('entry', require('./components/Entry.vue'));
 Vue.component('front', require('./components/Front.vue'));
 

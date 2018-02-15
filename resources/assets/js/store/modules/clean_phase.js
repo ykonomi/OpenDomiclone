@@ -13,7 +13,7 @@ const actions = {
             dispatch('clean').then(() => {
                 dispatch('exitTurn').then(() => {
                     commit('toNextPhase'); //Startに
-                    dispatch('startActionPhase');
+                    dispatch('start');
                 });
             });
         });
@@ -22,7 +22,7 @@ const actions = {
         return axios.get('/clean');
     },
     exitTurn({commit, dispatch}){
-        return axios.get('/turn_end',{params: {id : this.who_turn}});
+        return axios.put('/turns');
     },
 }
 

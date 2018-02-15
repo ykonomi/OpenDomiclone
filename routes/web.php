@@ -34,10 +34,11 @@ Route::get('/main',  function (){
 Route::group(['middleware' => ['auth']], function () {
     Route::post('/games', 'GameController@create');
     Route::post('/users', 'UserController@create');
+    Route::get('/turns/player', 'TurnController@show');
+    Route::put('/turns'       , 'TurnController@edit');
 });
 
 
-Route::get('/turns/player', 'TurnController@show');
 
 
 Route::get('/init_parent', 'GameController@initParent');
@@ -66,8 +67,6 @@ Route::get('/buy_phase/check' ,  'GameController@checkSelectedCards');
 Route::get('/buy_phase/buy' ,  'GameController@buy');
 
 Route::get('/clean' ,  'GameController@clean');
-Route::get('/turn_end', 'GameController@exitTurn');
-//Route::get('/lottery', 'GameController@lottery');
 
 //for debug
 Route::get('/init_playdata', 'DebugController@init');

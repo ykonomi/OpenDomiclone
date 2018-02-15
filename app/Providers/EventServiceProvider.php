@@ -28,11 +28,14 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\CountedVictory' => [
             'App\Listeners\CountedVictoryListener',
         ],
-        'App\Events\Result' => [
-            'App\Listeners\Result',
-        ],
         'App\Events\SettingCompleted' => [
-            'App\Listeners\SettingCompleted',
+            'App\Listeners\SettingCompletedListener',
+        ],
+        'App\Events\Result' => [
+            'App\Listeners\ResultListener',
+        ],
+        'App\Events\TurnChanged' => [
+            'App\Listeners\TurnChangedListener',
         ]
     ];
 

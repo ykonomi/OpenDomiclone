@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Turn extends Model
 {
     protected $fillable = [
-        'id', 'user_id'
+        'id', 'user_id', 'is_turn'
     ];
+
+    private $MEMBER_COUNT = 2;
+    
 
     /**
      * ターンテーブル（順番を決めるテーブル)を初期化する
@@ -49,7 +52,22 @@ class Turn extends Model
     }
 
 
+    /**
+     *  次のターンのプレイヤーを決めるメソッド
+     *  現在のプレイヤーのis_turnをfalseにし、
+     *  次のプレイヤーのis_turnをtrueにする。
+     */
+    public function change($player_id)
+    {
+        $player = $this->where('user_id', $player_id)->first();
+        $player->is_turn = false;
+        $player->save();
+        $next_id = $player->id % $this->MEMBER_COUNT + 1;
 
+        $turn = Turn::find($next_id);
+        $turn->is_turn = true;
+        $turn->save();
+    }
 
     /**
      *   参加者全てのidを取得する
