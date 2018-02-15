@@ -2,6 +2,7 @@
 
 const state = {
     buyId: 0,
+    beforeBuyId: 0,
     showBuyButton: false,
     showNoBuyButton: false,
     selected: 0,
@@ -23,26 +24,28 @@ const actions = {
         dispatch('resetHandsAndPlayArea').then(() => {
             commit('appearBuySelection');
             commit('appearNoBuyButton');
-            dispatch('updateLog', "購入するカードを選択してください。");
-            dispatch('toNextPhase', 'BeforeBuy');
+            commit('updateMessage', "購入するカードを選択してください。");
+            commit('toNextPhase');
         });
     },
-    selectCards({commit, dispatch}, buyId){
-        dispatch('clearCheckedCards').then(() => {
+    selectCards({state, commit, dispatch}, buyId){
+        if (state.beforeBuyId !== buyId){
+         //   TODO: カードのフォーカスが残ったままになってしまう
+         //   dispatch('clearCheckedCards').then(() => {
             commit('disappearBuyButton');
             commit('registerBuyId', buyId);
             dispatch('estimate', buyId).then(res => {
+                commit('updateMessage', res.data.message);
                 if (res.data.result){
-                    commit('update', "財宝カードを選択してください。");
                     if (res.data.is_zero){
                         commit('appearBuyButton');
                     }
-                    dispatch('toNextPhase', 'Buy');
-                } else {
-                    commit('update', "そのカードは高くて買えません。");
+                    commit('toNextPhase');
                 }
             });
-        });
+          //  });
+        } 
+        commit('beforeBuyId', buyId);
     },
     estimate({commit, dispatch}, id){
         return axios.get('/buy_phase/estimate', {params: {id: id}});
@@ -71,7 +74,7 @@ const actions = {
 
                 });
             }
-            commit('update', res.data.log);
+            commit('updateMessage', res.data.log);
         });
     },
     isChecked({commit, dispatch, rootState}){
@@ -112,6 +115,9 @@ const mutations = {
     },
     registerBuyId(state, id){
         state.buyId = id;
+    },
+    beforeBuyId(state, id){
+        state.beforeBuyId = id;
     },
     selectOption(state, selected){
         state.selected = selected;

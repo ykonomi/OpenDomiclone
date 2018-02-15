@@ -4,7 +4,7 @@
 // 
 
 const state = {
-    phase: 'start',
+    phase: 'Start',
 }
 
 // getters
@@ -14,32 +14,47 @@ const getters = {
 
 // actions
 const actions = {
-    toNextPhase ({commit, dispatch}, nextPhase){
-        commit('to', nextPhase);
-        switch (nextPhase) {
-            case 'start':
-                break;
-            case 'action':
-                break;
-            case 'attack':
-                break;
-            case 'prebuy':
-                dispatch('updateLog', "購入するカードを選択してください。");
-                break;
-            case 'buy':
-                break;
-            case 'crean':
-                break;
-        }
-    },
-    
 }
 
 // mutations
 const mutations = {
-    //1: state, 2:payload
-    to (state, nextPhase) {
-        state.phase = nextPhase;
+    toNextPhase(state){
+        switch(state.phase){
+            case 'Start':
+                state.phase = 'Action';
+                break;
+            case 'Action':
+                state.phase = 'BeforeBuying';
+                break;
+            case 'BeforeBuying':
+                state.phase = 'Buy';
+                break;
+            case 'Buy':
+                state.phase = 'Crean';
+                break;
+            case 'Clean':
+                state.phase = 'Start';
+                break;
+        }
+    },
+    toBackPhase(state){
+        switch(state.phase){
+            case 'Start':
+                state.phase = 'Crean';
+                break;
+            case 'Action':
+                state.phase = 'Start';
+                break;
+            case 'BeforeBuying':
+                state.phase = 'Action';
+                break;
+            case 'Buy':
+                state.phase = 'BeforeBuying';
+                break;
+            case 'Clean':
+                state.phase = 'Buy';
+                break;
+        }
     }
 }
 

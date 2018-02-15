@@ -5,7 +5,7 @@
             <div class="modal-container">
                 <div class="modal-body">
                     <slot name="body">
-                    人数が揃うのを待っています...({{member}}人)
+                    人数が揃うのを待っています...({{member}})
                     </slot>
                 </div>
             </div>

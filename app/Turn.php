@@ -39,10 +39,13 @@ class Turn extends Model
         $turn->save();
     }
 
-    public function is_player($id)
+    /**
+     * ターンテーブル（順番を決めるテーブル)から自身のプレイヤーデータを引き出す
+     */
+    public function getPlayer($id)
     {
         $player = $this->where('user_id', $id)->first();
-        return $player->is_turn;
+        return $player;
     }
 
 

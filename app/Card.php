@@ -11,11 +11,11 @@ class Card extends Model
 
     public function getInfoOf($id)
     {
-        $card = $this->find($id);
+        $card = $this->select('name_jp', 'description', 'coin_cost', 'card_type')->find($id);
         $result = ['name' => $card->name_jp,
-            'desc' => $card->description, 
-            'cost' => $card->coin_cost, 
-            'type' => $card->card_type];
+                   'desc' => $card->description, 
+                   'cost' => $card->coin_cost, 
+                   'type' => $card->card_type];
 
         return $result;
     }

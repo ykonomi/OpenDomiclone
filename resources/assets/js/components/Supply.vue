@@ -14,20 +14,14 @@
 
 <script>
 export default {
-    created: function (){
-    },
-    data: function () {
-        return {
-            selected_id : 0
-        }
-    },
     methods: {
         click: function(id){
             switch(this.$store.getters.phase){
-                case 'BeforeBuy':
+                case 'BeforeBuying':
                     this.$store.dispatch('selectCards', id);
                     break;
                 case 'Buy':
+                    this.$store.commit('toBackPhase');
                     this.$store.dispatch('selectCards', id);
                     break;
             }

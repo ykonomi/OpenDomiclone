@@ -7,14 +7,11 @@ const getters = {
 }
 
 const actions = {
-    updateLog (context, payload){
-        context.commit('update', payload); 
-    }
 }
 
 // mutations
 const mutations = {
-    update (state, log) {
+    updateMessage (state, log) {
         state.log = log + '\n' + state.log;
     }
 }

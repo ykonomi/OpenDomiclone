@@ -17,53 +17,51 @@ const getters = {
 }
 
 const actions = {
+    //ターンの開始に呼び出すメソッド
+    //現在のターンが自分のターンかをリクエストし、
+    //自分のターンの場合、アクションフェイズを開始する。
+    start({commit, dispatch}){
+        axios.get('/turns/player').then(e => {
+            if (e.data.is_turn){
+                dispatch('getSupplies').then(() =>{
+                    dispatch('startActionPhase');
+                });
+            } else {
+                dispatch('getSupplies');
+            }
+        });
+    },
     resetHandsAndPlayArea({dispatch}){
         return dispatch('getHandsAndPlayArea').then(() => {
             dispatch('clearCheckedCards');
         });
     },
     getHandsAndPlayArea({commit}){
-        //TODO Vue.nextTickは必要ない。
-        return Vue.nextTick(() => {
-            axios.get('/hands_and_playarea').then(res => {
-                commit('updateHands',    res.data.hands);
-                commit('updatePlayArea', res.data.playarea);
-            });
+        return axios.get('/hands_and_playarea').then(res => {
+            commit('updateHands',    res.data.hands);
+            commit('updatePlayArea', res.data.playarea);
         });
     },
     getHands ({commit}){
-        return Vue.nextTick(() => {
-            axios.get('/hands').then(res => {
-                commit('updateHands', res.data.ui);
-            })
-        });
+        return axios.get('/hands').then(res => {
+            commit('updateHands', res.data.ui);
+        })
     },
     getSupplies ({commit}){
-        return Vue.nextTick(() => {
-            axios.get('/supplies').then(res => {
-                commit('updateSupplies', res.data.ui);
-            });
-        });
+        return axios.get('/supplies').then(res => {
+            commit('updateSupplies', res.data.ui);
+        })
     },
     getPlayArea ({commit}){
-        return Vue.nextTick(() => {
-            axios.get('/playarea').then(res => {
-                commit('updatePlayArea', res.data.ui);
-            });
-        });
+        axios.get('/playarea').then(res => {
+            commit('updatePlayArea', res.data.ui);
+        })
     },
     getTrashes ({commit}){
-        return Vue.nextTick(() => {
-            axios.get('/trashes').then(res => {
-                commit('updateTrashes', res.data.ui);
-            });
-        });
+        axios.get('/trashes').then(res => {
+            commit('updateTrashes', res.data.ui);
+        })
     },
-    /*
-    isChecked({commit, dispatch}){
-        return axios.get('/buy_phase/check', {params: {checks: state.checks, id: state.buyId}});
-    },
-    */
     clearCheckedCards({commit}){
         commit('cleanChecks');
         commit('enableClearFocus');

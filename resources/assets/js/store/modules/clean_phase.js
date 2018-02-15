@@ -8,9 +8,11 @@ const getters = {
 
 const actions = {
     startCleanUpPhase({commit, dispatch}){
+        commit('toNextPhase'); //Cleanに
         dispatch('resetHandsAndPlayArea').then(() => {
             dispatch('clean').then(() => {
                 dispatch('exitTurn').then(() => {
+                    commit('toNextPhase'); //Startに
                     dispatch('startActionPhase');
                 });
             });

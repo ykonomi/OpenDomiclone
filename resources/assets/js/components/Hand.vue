@@ -19,8 +19,6 @@
 </template>
 <script>
 export default {
-    created: function (){
-    },
     methods: {
         click: function(value){
             switch(this.$store.getters.phase){

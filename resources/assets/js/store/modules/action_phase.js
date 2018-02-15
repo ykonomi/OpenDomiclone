@@ -10,12 +10,12 @@ const getters = {
 
 const actions = {
     startActionPhase ({commit, dispatch}){
+        commit('toNextPhase');  //Actionに
         dispatch('resetHandsAndPlayArea').then(() => {
             dispatch('exist').then(res => {
-                commit('update', res.data.log);
+                commit('updateMessage', res.data.log);
                 if (res.data.result){
                     commit('appearNoActionButton');
-                    dispatch('toNextPhase', 'Action');
                 } else {
                     commit('disappearNoActionButton');
                     dispatch('startBuyPhase');
@@ -29,7 +29,7 @@ const actions = {
     isActionCard({commit, dispatch}, index){
         return axios.get('/action_phase/is_action', 
             {params: {idx : index}}).then(res => {
-                commit('update', res.data.log);
+                commit('updateMessage', res.data.log);
                 if (res.data.result){
                     dispatch('action', index);
                 }
@@ -39,7 +39,7 @@ const actions = {
         return axios.get('/action_phase/action', {params: {idx : index}}).then(res => {
             dispatch('resetHandsAndPlayArea').then(() => {
                 if (res.data.pattern == 1){
-                    dispatch('updateLog', res.data.log);
+                    commit('updateMessage', res.data.log);
                     commit('disappearNoActionButton');
                     dispatch('toNextPhase','Chapel');
                 } else {

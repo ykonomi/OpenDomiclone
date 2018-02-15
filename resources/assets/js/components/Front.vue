@@ -20,27 +20,11 @@
 <script>
 export default {
     props: ['mode'],
-    data: function (){
-        return { 
-        }
-    },
     created: function (){
         if (this.mode !== 'debug'){
             Echo.join('game')
                 .here((users) => {
-                    axios.get('/turns/player').then(e => {
-                        if (e.data.is_player){
-                            this.$store.dispatch('getSupplies').then(() =>{
-                                this.$store.dispatch('toNextPhase', 'action');
-                                this.$store.dispatch('startActionPhase');
-                            });
-                            this.$store.dispatch('toNextPhase', 'action');
-
-                        } else {
-                            this.$store.dispatch('getSupplies').then(() =>{
-                            });
-                        }
-                    });
+                    this.$store.dispatch('start');
                 })
                 .joining((user) => {
                 })
@@ -48,23 +32,16 @@ export default {
                     console.log(user.name + 'がゲームから離れました');
                 })
                 .listen('TurnChanged', (e) => {
-                    this.who_turn = e.turn_id;
-                    if (this.my_id == e.turn_id){
-                        this.$store.dispatch('toNextPhase', 'action');
-                    }
+                    this.$store.dispatch('start');
                 })
-
         } else {
-            this.$store.dispatch('getSupplies').then(() =>{
-                this.$store.dispatch('startActionPhase');
+            axios.post('/users').then(res => {
+                this.$store.dispatch('getSupplies').then(() =>{
+                    this.$store.dispatch('startActionPhase');
+                });
             });
         }
-    },
-    data: function () {
-        return {
-        }
-    },
-    methods: {
     }
 }
 </script>
+

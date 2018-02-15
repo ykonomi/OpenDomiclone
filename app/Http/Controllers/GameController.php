@@ -381,9 +381,15 @@ class GameController extends Controller
         $cache = $user->estimate($hands) + $this->getUserCoins();
         $end = $card->find($cardId)->coin_cost;
 
+        $result = $cache >= $end;
+
+        if ($result){
+            $message = "財宝カードを選択してください。";
+        } else {
+            $message = "そのカードは高くて買えません。";
+        }
         //コストが0のとき
-        return (['result'  => $cache >= $end,
-            'is_zero' => $end === 0]);
+        return ['result'  => $result, 'is_zero' => $end === 0, 'message' => $message];
 
     }
 

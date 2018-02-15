@@ -16,10 +16,10 @@ class TurnController extends Controller
      *　現プレイヤーかを確認するメソッド
      *  セキュリティの都合による
      */
-    public function is_player(){
-
+    public function show(){
         $turns = new Turn();
-        return ['is_player' => $turns->is_player(session('player_id'))];
+        $playerId = session('player_id');
+        return $turns->getPlayer($playerId);
     }
 
 

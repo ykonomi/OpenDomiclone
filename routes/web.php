@@ -37,7 +37,7 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 
-Route::get('/turns/player', 'TurnController@is_player');
+Route::get('/turns/player', 'TurnController@show');
 
 
 Route::get('/init_parent', 'GameController@initParent');
