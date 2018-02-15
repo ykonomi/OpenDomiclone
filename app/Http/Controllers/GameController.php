@@ -17,6 +17,8 @@ use App\DummyTurn;
 class GameController extends Controller
 {
 
+    private $MEMBER_COUNT = 2;
+
     public function dummy()
     {
         
@@ -29,8 +31,8 @@ class GameController extends Controller
      *   
      *   @param Resquest 
      *   @return　
+     *   @deprecated
      */
-    // @deprecated
     public function entry(Request $request)
     {
         $id = (int) $request->get('id');
@@ -52,13 +54,17 @@ class GameController extends Controller
     }
 
 
+    /**
+     * ゲームの初期化を行うメソッド。サプライとターンテーブルの初期化を行い、
+     * 初期化が終わったことを全てのプレイヤーにブロードキャストする。
+     */
     public function create()
     {
         $supply = new Supply();
         $supply->init();
 
         $turnTable = new Turn();
-        $turnTable->init();
+        $turnTable->init($this->MEMBER_COUNT);
 
         broadcast(new \App\Events\SettingCompleted());
     }

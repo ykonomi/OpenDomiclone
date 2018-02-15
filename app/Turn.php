@@ -10,18 +10,44 @@ class Turn extends Model
         'id', 'user_id'
     ];
 
-    public function init()
+    /**
+     * ターンテーブル（順番を決めるテーブル)を初期化する
+     */
+    public function init($memberCount)
     {
         $this->truncate();
-        shuffle([1,2]);
 
-        foreach ($ids as $id) {
+    
+        $members = [];
+
+        for ($i=1; $i <= $memberCount; $i++) {
+            $members[] = $i;
+        }
+
+        shuffle($members);
+
+        foreach ($members as $member) {
             $turn = new Turn(); //foreachのたびにnewしないとsaveされないみたい
-            $turn->user_id = $id;
+            $turn->user_id = $member;
             $turn->save();
         }
-        
+    
+        //初めのレコードのプレイヤーをスタートプレイヤーとする
+        //既存のレコードを更新する場合、以下のようにする
+        $turn = Turn::find(1);
+        $turn->is_turn = true;
+        $turn->save();
     }
+
+    public function is_player($id)
+    {
+        $player = $this->where('user_id', $id)->first();
+        return $player->is_turn;
+    }
+
+
+
+
     /**
      *   参加者全てのidを取得する
      */

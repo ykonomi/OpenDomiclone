@@ -31,20 +31,12 @@ export default {
                 if (this.member === this.max){
                     axios.post('/games');
                 }
-                console.log('here');
-                console.log(this.member);
             })
             .joining((user) => {
-                //最後の参加者がジョインしたとき
                 this.member++;
-                //if (this.member === this.max){
-                //}
-                console.log('join');
-                console.log(this.member);
             })
             .leaving((user) => {
                 this.member--;
-                console.log(user.name);
             })
             .listen('SettingCompleted', (e) => {
                 axios.post('/users').then(res => {

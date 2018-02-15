@@ -15,8 +15,9 @@ Broadcast::channel('to-entry-game', function ($user) {
     return ['id' => $user->id, 'name' => $user->name];
 });
 
-//Broadcast::channel('channel-name', function ($user, $roomId) {
-//});
+Broadcast::channel('game', function ($user) {
+    return ['id' => $user->id, 'name' => $user->name];
+});
 
 //    if ($user->canJoinRoom($roomId)) {
 //        return ['id' => $user->id, 'name' => $user->name];

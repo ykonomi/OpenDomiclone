@@ -28,8 +28,8 @@ export default {
         if (this.mode !== 'debug'){
             Echo.join('game')
                 .here((users) => {
-                    axios.get('/turns/search').then(e => {
-                        if (e.data){
+                    axios.get('/turns/player').then(e => {
+                        if (e.data.is_player){
                             this.$store.dispatch('getSupplies').then(() =>{
                                 this.$store.dispatch('toNextPhase', 'action');
                                 this.$store.dispatch('startActionPhase');
@@ -38,7 +38,6 @@ export default {
 
                         } else {
                             this.$store.dispatch('getSupplies').then(() =>{
-                                this.$store.dispatch('startActionPhase');
                             });
                         }
                     });
