@@ -5,7 +5,13 @@
 ブラウザでの起動を想定しています。  
 
 ## 起動方法
-ローカル起動用に build_local.sh を用意しています。クローン後実行ください
+ローカル起動用に build_local.sh を用意しています。 git clone後実行ください。  
+ただし, ローカル環境では sqliteを使用しており、データベースファイルを絶対パスで指定する必要があるため .env.example の以下を書き換えてください
+
+```
+DB_DATABASE=/absolute/path/to/database.sqlite
+```
+
 
 ## 画面
 <img width="605" alt="2017-11-12 23 40 21" src="https://user-images.githubusercontent.com/29176287/32700112-b1fbc6a4-c803-11e7-8b7f-ea42f1e3454e.png">
