@@ -6,7 +6,8 @@
 
 ## 起動方法
 ローカル起動用に build_local.sh を用意しています。 git clone後実行ください。  
-ただし, ローカル環境では sqliteを使用しており、データベースファイルを絶対パスで指定する必要があるため .env.example の以下を書き換えてください
+ただし, ローカル環境では sqliteを使用しており、データベースファイルを絶対パスで指定する必要があります。  
+.env.example の以下の項目を書き換えてください。
 
 ```
 DB_DATABASE=/absolute/path/to/database.sqlite
