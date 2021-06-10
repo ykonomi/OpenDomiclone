@@ -83,3 +83,7 @@ Route::get('/debug/buy_counts'   ,'DebugController@get_buy_counts');
 
 
 
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
